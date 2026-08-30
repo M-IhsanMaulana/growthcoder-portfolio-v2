@@ -1,0 +1,17 @@
+{
+  "name": "@growthcoder/tailwind-config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./theme.css",
+  "style": "./theme.css",
+  "files": [
+    "theme.css"
+  ],
+  "exports": {
+    ".": "./theme.css",
+    "./theme.css": "./theme.css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4"
+  }
+}

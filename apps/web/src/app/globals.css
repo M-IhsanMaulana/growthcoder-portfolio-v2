@@ -1,0 +1,280 @@
+@import "tailwindcss";
+@import "@growthcoder/tailwind-config/theme.css";
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* ==========================================================================
+   Rich Article Content Typography System (HTML & Markdown Renderer)
+   ========================================================================== */
+
+.article-body,
+.article-content-rendered,
+.rich-content-body {
+  font-family: inherit;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--foreground);
+}
+
+/* Headings */
+.article-body h1,
+.article-content-rendered h1,
+.rich-content-body h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--foreground);
+  letter-spacing: -0.025em;
+}
+
+.article-body h2,
+.article-content-rendered h2,
+.rich-content-body h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.article-body h3,
+.article-content-rendered h3,
+.rich-content-body h3 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+  letter-spacing: -0.015em;
+}
+
+.article-body h4,
+.article-content-rendered h4,
+.rich-content-body h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+/* Paragraphs */
+.article-body p,
+.article-content-rendered p,
+.rich-content-body p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  line-height: 1.85;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+/* Bold / Strong */
+.article-body strong,
+.article-content-rendered strong,
+.rich-content-body strong,
+.article-body b,
+.article-content-rendered b,
+.rich-content-body b {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* Italic / Underline */
+.article-body em,
+.article-content-rendered em,
+.rich-content-body em,
+.article-body i,
+.article-content-rendered i,
+.rich-content-body i {
+  font-style: italic;
+}
+
+.article-body u,
+.article-content-rendered u,
+.rich-content-body u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Lists */
+.article-body ul,
+.article-content-rendered ul,
+.rich-content-body ul {
+  list-style-type: disc;
+  padding-left: 1.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.article-body ol,
+.article-content-rendered ol,
+.rich-content-body ol {
+  list-style-type: decimal;
+  padding-left: 1.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.article-body li,
+.article-content-rendered li,
+.rich-content-body li {
+  margin-bottom: 0.5rem;
+  line-height: 1.75;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+.article-body li > p,
+.article-content-rendered li > p,
+.rich-content-body li > p {
+  margin-bottom: 0.25rem;
+  display: inline;
+}
+
+/* Blockquote */
+.article-body blockquote,
+.article-content-rendered blockquote,
+.rich-content-body blockquote {
+  border-left: 4px solid var(--primary, #10b981);
+  background: rgba(16, 185, 129, 0.06);
+  padding: 1rem 1.5rem;
+  margin: 1.75rem 0;
+  border-radius: 0 1rem 1rem 0;
+  font-style: italic;
+  color: var(--foreground);
+  line-height: 1.8;
+}
+
+.article-body blockquote p,
+.article-content-rendered blockquote p,
+.rich-content-body blockquote p {
+  margin-bottom: 0;
+  opacity: 1;
+}
+
+/* Inline Code */
+.article-body code:not(pre code),
+.article-content-rendered code:not(pre code),
+.rich-content-body code:not(pre code) {
+  background: rgba(156, 163, 175, 0.15);
+  color: var(--primary, #10b981);
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+/* Code block / Pre */
+.article-body pre,
+.article-content-rendered pre,
+.rich-content-body pre {
+  background: #090d16;
+  color: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 1.75rem 0;
+  overflow-x: auto;
+}
+
+/* Links */
+.article-body a,
+.article-content-rendered a,
+.rich-content-body a {
+  color: var(--primary, #10b981);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.article-body a:hover,
+.article-content-rendered a:hover,
+.rich-content-body a:hover {
+  opacity: 0.8;
+}
+
+/* Horizontal Rule */
+.article-body hr,
+.article-content-rendered hr,
+.rich-content-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* Table styling */
+.article-body table,
+.article-content-rendered table,
+.rich-content-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.75rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.article-body table th,
+.article-body table td,
+.article-content-rendered table th,
+.article-content-rendered table td,
+.rich-content-body table th,
+.rich-content-body table td {
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.article-body table th,
+.article-content-rendered table th,
+.rich-content-body table th {
+  background: rgba(156, 163, 175, 0.1);
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* Image Figures */
+.article-body figure,
+.article-body figure.image,
+.article-content-rendered figure,
+.article-content-rendered figure.image,
+.rich-content-body figure,
+.rich-content-body figure.image {
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.article-body img,
+.article-content-rendered img,
+.rich-content-body img {
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.15);
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+
+.article-body figcaption,
+.article-content-rendered figcaption,
+.rich-content-body figcaption {
+  font-size: 0.85rem;
+  color: var(--muted-foreground, #9ca3af);
+  margin-top: 0.6rem;
+  font-style: italic;
+}
