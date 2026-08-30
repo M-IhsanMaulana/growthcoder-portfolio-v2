@@ -25,7 +25,7 @@ COPY apps/web/package.json ./apps/web/
 COPY apps/cms/package.json ./apps/cms/
 
 # Install all monorepo dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # ==========================================
 # 3. Build Stage
