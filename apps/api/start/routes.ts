@@ -49,12 +49,19 @@ const PublicExpertisesController = () => import('#controllers/public/expertises_
 const PublicSettingsController = () => import('#controllers/public/settings_controller')
 const PublicInboxesController = () => import('#controllers/public/inboxes_controller')
 
-// Health Check
+// Health Check Endpoints
 router.get('/', () => {
   return {
     name: 'growthcoder-api',
     status: 'online',
     version: '2.0.0',
+    timestamp: new Date().toISOString(),
+  }
+})
+
+router.get('/health', () => {
+  return {
+    status: 'ok',
     timestamp: new Date().toISOString(),
   }
 })

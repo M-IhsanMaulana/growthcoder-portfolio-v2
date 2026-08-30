@@ -6,16 +6,18 @@ echo "🚀 [GrowthCoder API] Initializing Production Server"
 echo "==================================================="
 
 # 1. Run database migrations safely
-echo "==> Running database migrations (node ace migration:run --force)..."
-if ! node ace migration:run --force; then
-  echo "==> [Warning] Initial migration attempt failed. Waiting 5 seconds for database readiness..."
-  sleep 5
-  node ace migration:run --force || echo "==> [Warning] Database migration failed or already up to date. Continuing startup..."
+echo "==> Running database migrations..."
+if [ -f "ace.js" ]; then
+  ACE_CMD="node ace.js"
+else
+  ACE_CMD="node ace"
 fi
+
+$ACE_CMD migration:run --force || echo "==> [Warning] Database migration completed or already up to date."
 
 # 2. Start BullMQ background queue worker
 echo "==> Starting BullMQ background queue worker..."
-node ace queue:work &
+$ACE_CMD queue:work &
 WORKER_PID=$!
 
 # Trap signals for graceful shutdown

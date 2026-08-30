@@ -61,9 +61,12 @@ RUN chmod +x ./entrypoint.sh
 # Remove workspace:* dependencies from build package.json & install production dependencies
 RUN sed -i '/@growthcoder/d' ./package.json && npm install --omit=dev --no-audit --no-fund
 
-# Create storage upload directory with proper permissions
-RUN mkdir -p ./storage/uploads
+# Create storage upload directory with proper permissions and curl for health checks
+RUN apk add --no-cache curl && mkdir -p ./storage/uploads
 
 EXPOSE 3333
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:3333/health || exit 1
 
 ENTRYPOINT ["./entrypoint.sh"]
