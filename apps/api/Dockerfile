@@ -54,15 +54,12 @@ ENV HOST=0.0.0.0
 # Copy compiled build output from AdonisJS build
 COPY --from=builder /app/apps/api/build ./
 
-# Copy packages needed by build workspace if any
-COPY --from=builder /app/packages ./packages
-
-# Install production dependencies inside build directory
-RUN npm install --omit=dev --no-audit --no-fund
-
 # Copy entrypoint script
 COPY apps/api/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
+
+# Remove workspace:* dependencies from build package.json & install production dependencies
+RUN sed -i '/@growthcoder/d' ./package.json && npm install --omit=dev --no-audit --no-fund
 
 # Create storage upload directory with proper permissions
 RUN mkdir -p ./storage/uploads
