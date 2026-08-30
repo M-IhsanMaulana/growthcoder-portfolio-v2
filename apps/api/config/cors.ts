@@ -1,5 +1,19 @@
-import app from '@adonisjs/core/services/app'
+import env from '#start/env'
 import { defineConfig } from '@adonisjs/cors'
+
+const allowedOriginsEnv = env.get('ALLOWED_ORIGINS')
+const parsedOrigins = allowedOriginsEnv
+  ? allowedOriginsEnv
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean)
+  : [
+      'https://growthcoder.id',
+      'https://www.growthcoder.id',
+      'https://admin.growthcoder.id',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ]
 
 /**
  * Configuration options to tweak the CORS policy. The following
@@ -11,30 +25,27 @@ const corsConfig = defineConfig({
   /**
    * Enable or disable CORS handling globally.
    */
-  enabled: true,
+  enabled: env.get('CORS_ENABLED', true),
 
   /**
-   * In development, allow every origin to simplify local front/backend setup.
-   * In production, keep an explicit allowlist (empty by default, so no
-   * cross-origin browser access is allowed until configured).
+   * Allow configured domains in production and local frontend in development.
    */
-  origin: app.inDev ? true : [],
+  origin: parsedOrigins,
 
   /**
    * HTTP methods accepted for cross-origin requests.
    */
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
   /**
-   * Reflect request headers by default. Use a string array to restrict
-   * allowed headers.
+   * Reflect request headers by default.
    */
   headers: true,
 
   /**
    * Response headers exposed to the browser.
    */
-  exposeHeaders: [],
+  exposeHeaders: ['set-cookie'],
 
   /**
    * Allow cookies/authorization headers on cross-origin requests.
