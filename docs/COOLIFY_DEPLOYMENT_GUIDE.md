@@ -211,18 +211,22 @@ NODE_ENV=production
 PORT=3333
 HOST=0.0.0.0
 LOG_LEVEL=info
+# App Secrets & Session
 APP_KEY=isi_string_acak_rahasia_minimal_32_karakter
+SESSION_DRIVER=cookie
 
 # URL Publik & Storage
 APP_URL=https://api.growthcoder.id
 IMAGE_BASE_URL=https://image.growthcoder.id
 STORAGE_DRIVER=local
+DRIVE_DISK=local
 
 # CORS & Allowed Origins
 CORS_ENABLED=true
 ALLOWED_ORIGINS=https://growthcoder.id,https://www.growthcoder.id,https://admin.growthcoder.id
 
 # PostgreSQL Connection (Gunakan detail dari Langkah 4A)
+DB_CONNECTION=pg
 DB_HOST=growthcoder-postgres
 DB_PORT=5432
 DB_USER=postgres
