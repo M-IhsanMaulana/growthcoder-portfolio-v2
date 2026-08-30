@@ -58,7 +58,7 @@ COPY --from=builder /app/apps/api/build ./
 COPY --from=builder /app/packages ./packages
 
 # Install production dependencies inside build directory
-RUN pnpm install --prod --ignore-scripts || npm install --omit=dev
+RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy entrypoint script
 COPY apps/api/entrypoint.sh ./entrypoint.sh
