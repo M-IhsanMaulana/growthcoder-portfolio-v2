@@ -174,6 +174,15 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
               </span>
             </div>
 
+            {project.role && (
+              <div className="flex items-center justify-between pt-3">
+                <span className="text-muted-foreground">Peran / Tanggung Jawab</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  {project.role}
+                </span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pt-3">
               <span className="text-muted-foreground flex items-center gap-1.5">
                 <Star className="w-3.5 h-3.5 text-amber-500" />

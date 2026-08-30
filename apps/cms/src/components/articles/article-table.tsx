@@ -65,6 +65,23 @@ export function ArticleTable() {
   // Status updating state
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  const handleOpenPreview = async (article: Article) => {
+    try {
+      const res = await apiClient.get<{ previewUrl: string }>(
+        `/api/admin/articles/${article.id}/preview-url`,
+      );
+      if (res.success && res.data?.previewUrl) {
+        window.open(res.data.previewUrl, "_blank");
+        return;
+      }
+    } catch (_err) {
+      // fallback
+    }
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "https://growthcoder.id";
+    window.open(`${siteUrl}/blog/${article.slug}?preview=true`, "_blank");
+  };
+
   const fetchCategories = useCallback(async () => {
     try {
       const res = await apiClient.get<Category[]>("/api/admin/categories");
@@ -484,15 +501,14 @@ export function ArticleTable() {
                             <BarChart2 className="h-4 w-4" />
                           </Link>
 
-                          <a
-                            href={`http://localhost:3000/artikel/${article.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                            title="Preview di Web Publik"
+                          <button
+                            type="button"
+                            onClick={() => handleOpenPreview(article)}
+                            className="rounded-lg p-1.5 text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors cursor-pointer"
+                            title="Pratinjau di Web Publik (Preview Mode)"
                           >
                             <ExternalLink className="h-4 w-4" />
-                          </a>
+                          </button>
 
                           <Link
                             href={`/articles/${article.id}/edit`}

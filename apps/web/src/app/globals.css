@@ -146,21 +146,27 @@ body {
 .article-body blockquote,
 .article-content-rendered blockquote,
 .rich-content-body blockquote {
+  position: relative;
   border-left: 4px solid var(--primary, #10b981);
-  background: rgba(16, 185, 129, 0.06);
-  padding: 1rem 1.5rem;
-  margin: 1.75rem 0;
-  border-radius: 0 1rem 1rem 0;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.08) 0%,
+    rgba(16, 185, 129, 0.02) 100%
+  );
+  padding: 1.25rem 1.75rem;
+  margin: 2rem 0;
+  border-radius: 0.5rem 1.25rem 1.25rem 0.5rem;
   font-style: italic;
   color: var(--foreground);
   line-height: 1.8;
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.05);
 }
 
 .article-body blockquote p,
 .article-content-rendered blockquote p,
 .rich-content-body blockquote p {
   margin-bottom: 0;
-  opacity: 1;
+  opacity: 0.95;
 }
 
 /* Inline Code */

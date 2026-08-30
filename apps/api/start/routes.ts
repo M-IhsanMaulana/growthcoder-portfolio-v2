@@ -126,6 +126,7 @@ router
     router.post('articles', [AdminArticlesController, 'store'])
     router.post('articles/publish-scheduled', [AdminArticlesController, 'publishScheduled'])
     router.get('articles/:id', [AdminArticlesController, 'show'])
+    router.get('articles/:id/preview-url', [AdminArticlesController, 'previewUrl'])
     router.get('articles/:id/analytics', [AdminArticlesController, 'analytics'])
     router.put('articles/:id', [AdminArticlesController, 'update'])
     router.delete('articles/:id', [AdminArticlesController, 'destroy'])

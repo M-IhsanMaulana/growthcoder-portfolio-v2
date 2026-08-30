@@ -16,6 +16,7 @@ import { ProjectGalleryLightbox } from "@/components/projects/project-gallery-li
 import { ProjectAdjacentNav } from "@/components/projects/project-adjacent-nav";
 import { LeadCaptureCta } from "@/components/home/lead-capture-cta";
 import { ProjectJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { TechStackIcon } from "@/components/tech-stack-icon";
 import {
   ChevronRight,
   Layers,
@@ -23,6 +24,7 @@ import {
   Building,
   Sparkles,
   CheckCircle2,
+  UserCheck,
 } from "lucide-react";
 
 export const revalidate = 60; // ISR
@@ -163,6 +165,12 @@ export default async function ProjectDetailPage({
                   {project.category.name}
                 </span>
               )}
+              {project.role && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+                  <UserCheck className="h-3.5 w-3.5" />
+                  <span>{project.role}</span>
+                </span>
+              )}
               <span className="px-3 py-1 rounded-full text-xs font-mono bg-muted/80 text-muted-foreground border border-border/50">
                 Tahun {project.projectYear || 2026}
               </span>
@@ -235,6 +243,18 @@ export default async function ProjectDetailPage({
                 </h3>
 
                 <div className="space-y-4 text-sm">
+                  {project.role && (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <UserCheck className="h-4 w-4 text-primary" />
+                        <span>Peran</span>
+                      </span>
+                      <span className="font-semibold text-foreground font-heading text-right">
+                        {project.role}
+                      </span>
+                    </div>
+                  )}
+
                   {project.clientName && (
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-muted-foreground flex items-center gap-1.5">
@@ -293,10 +313,10 @@ export default async function ProjectDetailPage({
                     {project.techStacks.map((tech) => (
                       <span
                         key={tech.id || tech.name}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono bg-muted/60 hover:bg-muted text-foreground border border-border/50 transition-colors"
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono bg-muted/60 hover:bg-muted text-foreground border border-border/60 shadow-2xs hover:border-border transition-all"
                       >
-                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                        <span>{tech.name}</span>
+                        <TechStackIcon tech={tech} className="w-3.5 h-3.5" />
+                        <span className="font-medium">{tech.name}</span>
                       </span>
                     ))}
                   </div>

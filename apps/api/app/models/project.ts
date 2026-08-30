@@ -34,6 +34,9 @@ export default class Project extends BaseModel {
   declare clientName: string | null
 
   @column()
+  declare role: string | null
+
+  @column()
   declare projectYear: number
 
   @column()

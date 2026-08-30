@@ -75,6 +75,7 @@ export function ProjectForm({ initialId }: ProjectFormProps) {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [clientName, setClientName] = useState("");
+  const [role, setRole] = useState("");
   const [projectYear, setProjectYear] = useState<number>(
     new Date().getFullYear(),
   );
@@ -144,6 +145,7 @@ export function ProjectForm({ initialId }: ProjectFormProps) {
         setExcerpt(p.excerpt || "");
         setContent(p.content || "");
         setClientName(p.clientName || "");
+        setRole(p.role || "");
         setProjectYear(p.projectYear || new Date().getFullYear());
         setCoverImage(p.coverImage);
         setDemoUrl(p.demoUrl || "");
@@ -268,6 +270,7 @@ export function ProjectForm({ initialId }: ProjectFormProps) {
       excerpt: excerpt.trim(),
       content: content.trim() || "<p></p>",
       clientName: clientName.trim() || null,
+      role: role.trim() || null,
       projectYear: Number(projectYear) || new Date().getFullYear(),
       coverImage: coverImage,
       demoUrl: demoUrl.trim() || null,
@@ -702,6 +705,22 @@ export function ProjectForm({ initialId }: ProjectFormProps) {
                   placeholder="e.g. PT Tech Innovator, Personal Project"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
+                  className="h-8.5 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="project-role"
+                  className="text-xs font-semibold"
+                >
+                  Peran / Tanggung Jawab (Role)
+                </Label>
+                <Input
+                  id="project-role"
+                  placeholder="e.g. Full-Stack Developer, Lead Architect"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   className="h-8.5 text-xs"
                 />
               </div>

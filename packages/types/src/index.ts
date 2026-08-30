@@ -213,6 +213,7 @@ export interface Project {
   excerpt: string;
   content: string; // Structured Case Study (Problem, Solution, Arch, Results)
   clientName?: string;
+  role?: string | null;
   projectYear: number;
   coverImage: string;
   demoUrl?: string;

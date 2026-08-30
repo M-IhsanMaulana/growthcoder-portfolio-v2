@@ -60,13 +60,22 @@ export function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
   };
 
   const handleCopyLink = () => {
-    const webUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000";
-    const fullUrl = `${webUrl}/projects/${project.slug}`;
+    const webUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.NEXT_PUBLIC_WEB_URL ||
+      "https://growthcoder.id";
+    const fullUrl = `${webUrl.replace(/\/$/, "")}/projects/${project.slug}`;
     navigator.clipboard.writeText(fullUrl);
     setCopied(true);
     toast.success("Tautan proyek berhasil disalin!");
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const webUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_WEB_URL ||
+    "https://growthcoder.id";
+  const publicProjectUrl = `${webUrl.replace(/\/$/, "")}/projects/${project.slug}`;
 
   return (
     <div className="space-y-4">
@@ -81,6 +90,23 @@ export function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
         </Link>
 
         <div className="flex items-center gap-2">
+          <a
+            href={publicProjectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs font-semibold text-primary border-primary/30 hover:bg-primary/10 gap-1.5"
+              title="Buka halaman detail proyek di website publik"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Lihat di Web
+            </Button>
+          </a>
+
           {project.demoUrl && (
             <a
               href={project.demoUrl}
@@ -195,6 +221,12 @@ export function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   <Briefcase className="w-3 h-3" />
                   {project.category.name}
+                </span>
+              )}
+
+              {project.role && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                  Peran: {project.role}
                 </span>
               )}
 

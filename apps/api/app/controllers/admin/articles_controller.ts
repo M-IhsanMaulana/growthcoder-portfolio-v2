@@ -6,6 +6,8 @@ import SanitizerService from '#services/sanitizer_service'
 import stringHelpers from '@adonisjs/core/helpers/string'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
+import { createHmac } from 'node:crypto'
+import env from '#start/env'
 
 function computeContentEvaluation(content: string = '', readingTimeMinutes?: number | null) {
   const plainText = content
@@ -213,6 +215,23 @@ export default class ArticlesController {
     return response.ok({
       success: true,
       data: post,
+    })
+  }
+
+  async previewUrl({ params, response }: HttpContext) {
+    const post = await Post.query().where('id', params.id).firstOrFail()
+    const appKey = env.get('APP_KEY') || 'growthcoder-default-secret-key'
+    const token = createHmac('sha256', appKey).update(`${post.slug}:preview`).digest('hex')
+    const siteUrl = env.get('FRONTEND_URL') || env.get('SITE_URL') || 'https://growthcoder.id'
+    const previewUrl = `${siteUrl.replace(/\/$/, '')}/blog/${post.slug}?preview=true&token=${token}`
+
+    return response.ok({
+      success: true,
+      data: {
+        previewUrl,
+        token,
+        slug: post.slug,
+      },
     })
   }
 

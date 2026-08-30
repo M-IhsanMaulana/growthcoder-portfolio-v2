@@ -2427,18 +2427,30 @@ function getFallbackArticlesWithFilter(params?: ArticleFilterParams): {
 }
 
 /**
- * Fetch Single Article Detail by Slug or ID
+ * Fetch Single Article Detail by Slug or ID (Supports Preview Mode)
  */
-export async function getArticleBySlug(slug: string): Promise<Article | null> {
+export async function getArticleBySlug(
+  slug: string,
+  previewOptions?: { preview?: boolean; token?: string },
+): Promise<Article | null> {
   const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const isPreview = Boolean(previewOptions?.preview);
 
   try {
-    const res = await safeFetch(
-      `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles/${encodeURIComponent(slug)}`,
-      {
-        next: { revalidate: 60 },
-      },
-    );
+    const queryParams = new URLSearchParams();
+    if (isPreview) {
+      queryParams.set("preview", "true");
+      if (previewOptions?.token) {
+        queryParams.set("token", previewOptions.token);
+      }
+    }
+
+    const queryString = queryParams.toString();
+    const endpoint = `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles/${encodeURIComponent(slug)}${queryString ? `?${queryString}` : ""}`;
+
+    const res = await safeFetch(endpoint, {
+      ...(isPreview ? { cache: "no-store" } : { next: { revalidate: 60 } }),
+    });
 
     if (!res.ok) {
       const match = FALLBACK_ALL_ARTICLES.find(

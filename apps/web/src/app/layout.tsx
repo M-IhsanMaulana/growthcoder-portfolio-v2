@@ -56,86 +56,99 @@ export async function generateMetadata(): Promise<Metadata> {
     settings.profile.bio ||
     "Portofolio & blog rekayasa perangkat lunak Muhammad Ihsan Maulana (GrowthCoder).";
 
-  return {
-    metadataBase: new URL(baseUrl),
-    title: {
-      default: siteTitle,
-      template: `%s — ${settings.profile.siteName || "GrowthCoder"}`,
-    },
-    description,
-    icons: {
-      icon: [
-        { url: "/gc-icon.png?v=2", type: "image/png" },
-        { url: "/icon.png?v=2", type: "image/png" },
-      ],
-      apple: [{ url: "/gc-icon.png?v=2" }],
-      shortcut: ["/gc-icon.png?v=2"],
-    },
-    keywords: settings.seo.metaKeywords || [
-      "Software Engineer",
-      "Full-Stack Developer",
-      "Next.js",
-      "AdonisJS",
-      "PostgreSQL",
-      "TypeScript",
-      "System Architecture",
-      "Muhammad Ihsan Maulana",
-      "GrowthCoder",
-    ],
-    authors: [
-      {
-        name: settings.profile.ownerName || "Muhammad Ihsan Maulana",
-        url: baseUrl,
+    const ogImage = settings.seo?.ogImageUrl || "/og-image.png";
+
+    return {
+      metadataBase: new URL(baseUrl),
+      title: {
+        default: siteTitle,
+        template: `%s — ${settings.profile.siteName || "GrowthCoder"}`,
       },
-    ],
-    creator: settings.profile.ownerName || "Muhammad Ihsan Maulana",
-    publisher: settings.profile.siteName || "GrowthCoder",
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
+      description,
+      icons: {
+        icon: [
+          { url: "/gc-icon.png?v=2", type: "image/png" },
+          { url: "/icon.png?v=2", type: "image/png" },
+        ],
+        apple: [{ url: "/gc-icon.png?v=2" }],
+        shortcut: ["/gc-icon.png?v=2"],
+      },
+      keywords: settings.seo.metaKeywords || [
+        "Software Engineer",
+        "Full-Stack Developer",
+        "Next.js",
+        "AdonisJS",
+        "PostgreSQL",
+        "TypeScript",
+        "System Architecture",
+        "Muhammad Ihsan Maulana",
+        "GrowthCoder",
+      ],
+      authors: [
+        {
+          name: settings.profile.ownerName || "Muhammad Ihsan Maulana",
+          url: baseUrl,
+        },
+      ],
+      creator: settings.profile.ownerName || "Muhammad Ihsan Maulana",
+      publisher: settings.profile.siteName || "GrowthCoder",
+      robots: {
         index: true,
         follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
       },
-    },
-    alternates: {
-      canonical: baseUrl,
-      types: {
-        "application/rss+xml": [
-          {
-            url: `${baseUrl}/feed.xml`,
-            title: `${settings.profile.siteName} RSS Feed`,
-          },
-          {
-            url: `${baseUrl}/rss.xml`,
-            title: `${settings.profile.siteName} RSS Feed (Alt)`,
-          },
-        ],
+      alternates: {
+        canonical: baseUrl,
+        types: {
+          "application/rss+xml": [
+            {
+              url: `${baseUrl}/feed.xml`,
+              title: `${settings.profile.siteName} RSS Feed`,
+            },
+            {
+              url: `${baseUrl}/rss.xml`,
+              title: `${settings.profile.siteName} RSS Feed (Alt)`,
+            },
+          ],
+        },
       },
-    },
-    openGraph: {
-      type: "website",
-      locale: "id_ID",
-      url: baseUrl,
-      title: siteTitle,
-      description,
-      siteName: settings.profile.siteName || "GrowthCoder",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: siteTitle,
-      description,
-      creator: "@growthcoder",
-    },
-    verification: gscVerification
-      ? {
-          google: gscVerification,
-        }
-      : undefined,
-  };
+      openGraph: {
+        type: "website",
+        locale: "id_ID",
+        url: baseUrl,
+        title: siteTitle,
+        description,
+        siteName: settings.profile.siteName || "GrowthCoder",
+        images: ogImage
+          ? [
+              {
+                url: ogImage,
+                width: 1200,
+                height: 630,
+                alt: siteTitle,
+              },
+            ]
+          : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: siteTitle,
+        description,
+        creator: "@growthcoder",
+        images: ogImage ? [ogImage] : undefined,
+      },
+      verification: gscVerification
+        ? {
+            google: gscVerification,
+          }
+        : undefined,
+    };
 }
 
 export default async function RootLayout({

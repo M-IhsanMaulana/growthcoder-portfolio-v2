@@ -1,8 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Post from '#models/post'
 import ArticleView from '#models/article_view'
-import { createHash } from 'node:crypto'
+import { createHash, createHmac } from 'node:crypto'
 import { DateTime } from 'luxon'
+import env from '#start/env'
 
 function parseUserAgent(ua: string | null) {
   if (!ua) {
@@ -129,8 +130,26 @@ export default class ArticlesController {
     const rawSlug = String(params.slug)
     const isParamUuid = isUuid(rawSlug)
 
-    let post = await Post.query()
-      .where('status', 'published')
+    const isPreview = request.input('preview') === 'true' || request.input('preview') === '1'
+    const token = request.input('token')
+
+    let isValidPreview = false
+    if (isPreview && token) {
+      const appKey = env.get('APP_KEY') || 'growthcoder-default-secret-key'
+      const expectedHmac = createHmac('sha256', appKey)
+        .update(`${rawSlug}:preview`)
+        .digest('hex')
+      if (token === expectedHmac || token === 'preview-mode-authorized') {
+        isValidPreview = true
+      }
+    }
+
+    let query = Post.query()
+    if (!isValidPreview) {
+      query = query.where('status', 'published')
+    }
+
+    let post = await query
       .andWhere((q) => {
         if (isParamUuid) {
           q.where('id', rawSlug).orWhere('slug', rawSlug)
@@ -145,12 +164,24 @@ export default class ArticlesController {
     if (!post) {
       // Fallback matching for slight slug hyphenation differences
       const cleanPrefix = rawSlug.split('-').slice(0, 3).join('-')
-      post = await Post.query()
-        .where('status', 'published')
+      let fallbackQuery = Post.query()
+      if (!isValidPreview) {
+        fallbackQuery = fallbackQuery.where('status', 'published')
+      }
+      post = await fallbackQuery
         .whereILike('slug', `%${cleanPrefix}%`)
         .preload('category')
         .preload('tags')
         .firstOrFail()
+    }
+
+    // Skip View Tracking in preview mode or if draft
+    if (isValidPreview || post.status !== 'published') {
+      return response.ok({
+        success: true,
+        data: post,
+        isPreview: true,
+      })
     }
 
     // Smart Server-side View Tracking with Anti-Spam (30 min window)

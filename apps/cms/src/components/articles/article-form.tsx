@@ -17,6 +17,7 @@ import {
   Hash,
   Plus,
   X,
+  Eye,
 } from "lucide-react";
 import {
   Button,
@@ -314,6 +315,29 @@ export function ArticleForm({ initialId }: ArticleFormProps) {
     }
   };
 
+  const handlePreviewWeb = async () => {
+    if (!initialId) {
+      toast.info(
+        "Silakan simpan draft artikel terlebih dahulu untuk mengaktifkan pratinjau aman di web.",
+      );
+      return;
+    }
+    try {
+      const res = await apiClient.get<{ previewUrl: string }>(
+        `/api/admin/articles/${initialId}/preview-url`,
+      );
+      if (res.success && res.data?.previewUrl) {
+        window.open(res.data.previewUrl, "_blank");
+        return;
+      }
+    } catch (_err) {
+      // fallback
+    }
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "https://growthcoder.id";
+    window.open(`${siteUrl}/blog/${slug}?preview=true`, "_blank");
+  };
+
   if (isFetching) {
     return (
       <div className="flex h-96 items-center justify-center rounded-2xl border border-border bg-card">
@@ -352,6 +376,20 @@ export function ArticleForm({ initialId }: ArticleFormProps) {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
+          {isEditing && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePreviewWeb}
+              className="text-xs rounded-xl border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+              title="Buka pratinjau live di web publik"
+            >
+              <Eye className="h-3.5 w-3.5 mr-1.5" />
+              Pratinjau di Web
+            </Button>
+          )}
+
           <Button
             type="button"
             variant="outline"

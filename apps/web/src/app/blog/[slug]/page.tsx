@@ -35,6 +35,7 @@ export const revalidate = 60; // ISR revalidation 60s
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ preview?: string; token?: string }>;
 }
 
 function formatDate(dateStr?: string) {
@@ -53,11 +54,16 @@ function formatDate(dateStr?: string) {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: ArticleDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const search = searchParams ? await searchParams : {};
+  const isPreview = search.preview === "true" || search.preview === "1";
+  const token = search.token;
+
   const [settings, article] = await Promise.all([
     getSiteSettings(),
-    getArticleBySlug(slug),
+    getArticleBySlug(slug, { preview: isPreview, token }),
   ]);
 
   if (!article) {
@@ -99,11 +105,16 @@ export async function generateMetadata({
 
 export default async function ArticleDetailPage({
   params,
+  searchParams,
 }: ArticleDetailPageProps) {
   const { slug } = await params;
+  const search = searchParams ? await searchParams : {};
+  const isPreview = search.preview === "true" || search.preview === "1";
+  const token = search.token;
+
   const [settings, article] = await Promise.all([
     getSiteSettings(),
-    getArticleBySlug(slug),
+    getArticleBySlug(slug, { preview: isPreview, token }),
   ]);
 
   if (!article) {
@@ -137,6 +148,16 @@ export default async function ArticleDetailPage({
 
   return (
     <SiteLayout settings={settings}>
+      {/* Draft Preview Indicator Banner */}
+      {isPreview && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-md text-amber-950 px-4 py-2 text-xs font-semibold text-center flex items-center justify-center gap-2 shadow-md">
+          <Sparkles className="h-4 w-4 shrink-0" />
+          <span>
+            Mode Pratinjau Draft: Artikel ini belum dipublikasikan ke publik.
+          </span>
+        </div>
+      )}
+
       {/* Top Reading Progress Bar */}
       <BlogReadingProgress />
 

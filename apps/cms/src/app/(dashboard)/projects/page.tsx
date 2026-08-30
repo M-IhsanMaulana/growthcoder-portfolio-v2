@@ -414,6 +414,12 @@ export default function ProjectsPage() {
                         </span>
                       )}
 
+                      {project.role && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          {project.role}
+                        </span>
+                      )}
+
                       {project.projectYear && (
                         <span className="text-[11px] text-muted-foreground font-mono flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -527,6 +533,17 @@ export default function ProjectsPage() {
                           <Eye className="w-3.5 h-3.5 mr-2 text-emerald-500" />
                           <span>Rincian & Analitik</span>
                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_SITE_URL || "https://growthcoder.id"}/projects/${project.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cursor-pointer text-xs flex items-center"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 mr-2 text-primary" />
+                          <span>Lihat di Web Publik</span>
+                        </a>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={`/projects/${project.id}/edit`}>

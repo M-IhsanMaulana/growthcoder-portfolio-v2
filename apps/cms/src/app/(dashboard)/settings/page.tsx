@@ -50,6 +50,7 @@ import type {
 } from "@growthcoder/types";
 import { AvatarUploadField } from "@/components/settings/avatar-upload-field";
 import { DocumentUploadField } from "@/components/settings/document-upload-field";
+import { OgImageUploadField } from "@/components/settings/og-image-upload-field";
 import { RichEditor } from "@/components/editor/rich-editor";
 
 const defaultStats: StatItem[] = [
@@ -1334,6 +1335,13 @@ export default function SettingsPage() {
                   onChange={(e) => setKeywordsString(e.target.value)}
                   placeholder="Full-Stack, Next.js, Developer Portfolio, React"
                   className="text-xs h-9"
+                />
+              </div>
+
+              <div className="pt-2 border-t border-border">
+                <OgImageUploadField
+                  value={seo.ogImageUrl || ""}
+                  onChange={(url) => setSeo({ ...seo, ogImageUrl: url })}
                 />
               </div>
 
