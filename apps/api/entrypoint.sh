@@ -15,7 +15,11 @@ fi
 
 $ACE_CMD migration:run --force || echo "==> [Warning] Database migration completed or already up to date."
 
-# 2. Start BullMQ background queue worker
+# 2. Run initial database seeds (Admin user, settings, taxanomies)
+echo "==> Running database seeders..."
+$ACE_CMD db:seed || echo "==> [Warning] Database seeding completed or skipped."
+
+# 3. Start BullMQ background queue worker
 echo "==> Starting BullMQ background queue worker..."
 $ACE_CMD queue:work &
 WORKER_PID=$!
