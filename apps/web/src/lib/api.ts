@@ -38,6 +38,27 @@ export function resolveMediaUrl(url?: string | null): string {
   return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
+/**
+ * Safe fetch wrapper with 3s timeout to prevent Docker build hangs during SSG pre-rendering
+ */
+export async function safeFetch(
+  url: string | URL | Request,
+  init?: RequestInit,
+  timeoutMs = 3000
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      ...init,
+      signal: init?.signal || controller.signal,
+    });
+    return res;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export const DEFAULT_SITE_PROFILE: SiteProfile = {
   siteName: "GrowthCoder",
   ownerName: "Muhammad Ihsan Maulana",
@@ -1737,7 +1758,7 @@ export async function fetchApi<T>(
   const url = `${API_BASE_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
 
   try {
-    const res = await fetch(url, {
+    const res = await safeFetch(url, {
       ...init,
       headers: {
         "Content-Type": "application/json",
@@ -1763,7 +1784,7 @@ export async function fetchApi<T>(
  */
 export async function getSiteSettings(): Promise<SiteSettingsData> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/settings`,
       {
         next: { revalidate: 60 },
@@ -1837,7 +1858,7 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
  */
 export async function getExpertises(): Promise<Expertise[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/expertises`,
       {
         next: { revalidate: 60 },
@@ -1867,7 +1888,7 @@ export async function getExpertises(): Promise<Expertise[]> {
  */
 export async function getFeaturedProjects(): Promise<Project[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects?featured=true`,
       {
         next: { revalidate: 60 },
@@ -1897,7 +1918,7 @@ export async function getFeaturedProjects(): Promise<Project[]> {
  */
 export async function getTechStacks(): Promise<TechStack[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/tech-stacks`,
       {
         next: { revalidate: 60 },
@@ -1927,7 +1948,7 @@ export async function getTechStacks(): Promise<TechStack[]> {
  */
 export async function getCareerTimeline(): Promise<Experience[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/experiences`,
       {
         next: { revalidate: 60 },
@@ -1967,7 +1988,7 @@ export async function getCareerAndEducation(): Promise<{
   certifications: Certification[];
 }> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/experiences`,
       {
         next: { revalidate: 60 },
@@ -2035,7 +2056,7 @@ export async function getCareerAndEducation(): Promise<{
  */
 export async function getPhilosophies(): Promise<DevelopmentPhilosophy[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/philosophies`,
       {
         next: { revalidate: 60 },
@@ -2065,7 +2086,7 @@ export async function getPhilosophies(): Promise<DevelopmentPhilosophy[]> {
  */
 export async function getLatestArticles(limit: number = 3): Promise<Article[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles?limit=${limit}`,
       {
         next: { revalidate: 60 },
@@ -2107,7 +2128,7 @@ export async function getAllProjects(
     if (params?.search) query.set("search", params.search);
 
     const queryString = query.toString() ? `?${query.toString()}` : "";
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects${queryString}`,
       {
         next: { revalidate: 60 },
@@ -2200,7 +2221,7 @@ function getFallbackProjectsWithFilter(params?: ProjectFilterParams): {
  */
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects/${encodeURIComponent(slug)}`,
       {
         next: { revalidate: 60 },
@@ -2230,7 +2251,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
  */
 export async function getProjectCategories(): Promise<ProjectCategory[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/project-categories`,
       {
         next: { revalidate: 60 },
@@ -2320,7 +2341,7 @@ export async function getAllArticles(
     if (params?.search) query.set("search", params.search);
 
     const queryString = query.toString() ? `?${query.toString()}` : "";
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles${queryString}`,
       {
         next: { revalidate: 60 },
@@ -2412,7 +2433,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
 
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles/${encodeURIComponent(slug)}`,
       {
         next: { revalidate: 60 },
@@ -2463,7 +2484,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
  */
 export async function getArticleCategories(): Promise<Category[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/categories?status=published`,
       {
         next: { revalidate: 60 },
@@ -2487,7 +2508,7 @@ export async function getArticleCategories(): Promise<Category[]> {
  */
 export async function getArticleTags(): Promise<Tag[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/tags?status=published`,
       {
         next: { revalidate: 60 },
@@ -2824,7 +2845,7 @@ export const FALLBACK_WORKFLOW_STEPS: WorkflowStep[] = [
  */
 export async function getWorkflowSteps(): Promise<WorkflowStep[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/workflows`,
       {
         next: { revalidate: 60 },
@@ -2848,7 +2869,7 @@ export async function getWorkflowSteps(): Promise<WorkflowStep[]> {
  */
 export async function getServices(): Promise<Service[]> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/services`,
       {
         next: { revalidate: 60 },
@@ -2872,7 +2893,7 @@ export async function getServices(): Promise<Service[]> {
  */
 export async function getServiceBySlug(slug: string): Promise<Service | null> {
   try {
-    const res = await fetch(
+    const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/services/${slug}`,
       {
         next: { revalidate: 60 },
