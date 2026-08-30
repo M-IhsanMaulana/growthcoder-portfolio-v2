@@ -75,7 +75,7 @@ graph TD
    curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
    ```
 4. Setelah instalasi selesai (sekitar 2–3 menit), buka browser dan akses dashboard Coolify Anda di:
-   $$\textbf{\texttt{http://<IP\_VPS\_ANDA>:8000}}$$
+   **`http://<IP_VPS_ANDA>:8000`**
 5. Buat akun Administrator pertama Anda di layar registrasi awal.
 
 ---
