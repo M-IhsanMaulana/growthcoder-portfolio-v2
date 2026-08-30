@@ -1,6 +1,6 @@
 # 🚀 Panduan Lengkap Deployment Monorepo Menggunakan Coolify & Cloudflare DNS
 
-Panduan ini berisi langkah-langkah praktis dan terperinci untuk melakukan deployment aplikasi **GrowthCoder Monorepo** (Next.js Web, Next.js CMS, AdonisJS v6 API, PostgreSQL, dan Redis) menggunakan **Coolify** di VPS Ubuntu, terintegrasi dengan **Cloudflare DNS & SSL**.
+Panduan ini berisi langkah-langkah praktis dan terperinci untuk melakukan deployment aplikasi **GrowthCoder Monorepo** (Next.js Web, Next.js CMS, AdonisJS v6 API, PostgreSQL, dan Redis) menggunakan **Coolify v4** di VPS Ubuntu, terintegrasi dengan **Cloudflare DNS & SSL**.
 
 ---
 
@@ -10,11 +10,12 @@ Panduan ini berisi langkah-langkah praktis dan terperinci untuk melakukan deploy
 2. [Persiapan VPS & Instalasi Coolify](#2-persiapan-vps--instalasi-coolify)
 3. [Konfigurasi Cloudflare DNS & SSL](#3-konfigurasi-cloudflare-dns--ssl)
 4. [Membuat Database PostgreSQL & Redis di Coolify](#4-membuat-database-postgresql--redis-di-coolify)
-5. [Deploy Backend API (`apps/api`)](#5-deploy-backend-api-appsapi)
-6. [Deploy Frontend Web (`apps/web`)](#6-deploy-frontend-web-appsweb)
-7. [Deploy Admin CMS (`apps/cms`)](#7-deploy-admin-cms-appscms)
-8. [Verifikasi CI/CD & Auto Deploy](#8-verifikasi-cicd--auto-deploy)
-9. [Panduan Migrasi Masa Depan ke Cloudflare R2](#9-panduan-migrasi-masa-depan-ke-cloudflare-r2)
+5. [Menghubungkan GitHub App ke Coolify](#5-menghubungkan-github-app-ke-coolify)
+6. [Deploy Backend API (`apps/api`)](#6-deploy-backend-api-appsapi)
+7. [Deploy Frontend Web (`apps/web`)](#7-deploy-frontend-web-appsweb)
+8. [Deploy Admin CMS (`apps/cms`)](#8-deploy-admin-cms-appscms)
+9. [Verifikasi CI/CD & Auto Deploy](#9-verifikasi-cicd--auto-deploy)
+10. [Panduan Migrasi Masa Depan ke Cloudflare R2](#10-panduan-migrasi-masa-depan-ke-cloudflare-r2)
 
 ---
 
@@ -35,9 +36,9 @@ graph TD
     CoolifyTraefik -->|Port 3333| APICont[Container: AdonisJS v6 API]
 
     APICont -->|Auto Migration + Server + BullMQ Worker| APICont
-    APICont -->|Port 5432| PostgresCont[(Container: PostgreSQL 16)]
+    APICont -->|Port 5432| PostgresCont[(Container: PostgreSQL 16/18)]
     APICont -->|Port 6379| RedisCont[(Container: Redis 7)]
-    APICont -->|Volume Mount| DiskVolume[Persistent Disk: /storage/uploads]
+    APICont -->|Volume Mount| DiskVolume[Persistent Disk: /app/storage/uploads]
 ```
 
 | Service           | Subdomain / URL                                         | Port Container | Keterangan                          |
@@ -57,7 +58,7 @@ graph TD
 
 - **OS:** Ubuntu 22.04 LTS / 24.04 LTS (Fresh install).
 - **CPU:** 2 vCPU Core.
-- **RAM:** 4 GB RAM (Sangat disarankan 4GB agar proses build Next.js dan AdonisJS monorepo berjalan cepat tanpa error _Out of Memory_).
+- **RAM:** 4 GB RAM (Sangat disarankan 4GB agar proses build Next.js dan AdonisJS monorepo berjalan lancar tanpa error _Out of Memory_).
 - **Storage:** 30 GB+ SSD / NVMe.
 
 ### Langkah Instalasi Coolify:
@@ -70,7 +71,7 @@ graph TD
    ```bash
    apt update && apt upgrade -y && apt install curl -y
    ```
-3. Jalankan perintah instalasi otomatis Coolify resmi:
+3. Jalankan script instalasi resmi Coolify:
    ```bash
    curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
    ```
@@ -86,7 +87,7 @@ Buka dashboard **Cloudflare** untuk domain `growthcoder.id`:
 
 ### A. Tambahkan DNS Records (A Record)
 
-Tambahkan record berikut mengarah ke IP publik VPS Anda (Pastikan icon awan / Proxy **Aktif / Orange Cloud**):
+Tambahkan record berikut mengarah ke IP publik VPS Anda (Pastikan status Proxy **Aktif / Orange Cloud**):
 
 | Type | Name                        | IPv4 Address    | Proxy Status     |
 | :--- | :-------------------------- | :-------------- | :--------------- |
@@ -102,7 +103,7 @@ Tambahkan record berikut mengarah ke IP publik VPS Anda (Pastikan icon awan / Pr
    - Pilih mode enkripsi: **Full** atau **Full (Strict)**.
 2. Buka menu **Network**:
    - Pastikan **WebSockets** dalam status **ON** (Diperlukan untuk AdonisJS Transmit SSE & real-time updates).
-3. _(Opsional - Disarankan)_ Buka menu **SSL/TLS** -> **Edge Certificates**:
+3. _(Disarankan)_ Buka menu **SSL/TLS** -> **Edge Certificates**:
    - Aktifkan **Always Use HTTPS**: `ON`.
    - Aktifkan **Automatic HTTPS Rewrites**: `ON`.
 
@@ -110,110 +111,157 @@ Tambahkan record berikut mengarah ke IP publik VPS Anda (Pastikan icon awan / Pr
 
 ## 4. Membuat Database PostgreSQL & Redis di Coolify
 
-Sebelum men-deploy aplikasi, kita buat terlebih dahulu database dan cache di Coolify UI:
+> [!IMPORTANT]
+> **Database & Redis WAJIB dibuat dan di-start terlebih dahulu** sebelum men-deploy aplikasi. Backend API memerlukan koneksi database aktif saat startup untuk auto-migration.
 
-### A. Membuat PostgreSQL 16
+### A. Membuat PostgreSQL
 
-1. Di Dashboard Coolify, masuk ke menu **Projects** -> Pilih Environment **Production** -> Klik **+ New Resource**.
-2. Pilih **PostgreSQL**.
-3. Isi konfigurasi:
-   - **Database Name:** `growthcoder_db`
-   - **User:** `growthcoder_user`
-   - **Password:** _(Generate kata sandi yang aman atau biarkan dibuat otomatis oleh Coolify)_
-4. Klik **Save** lalu klik **Start**.
-5. Catat **Internal Connection String** atau detail koneksinya (misal: Host internal `postgres` / `postgresql-<id>`, user, password, dan nama database).
-
-### B. Membuat Redis 7
-
-1. Klik **+ New Resource** -> Pilih **Redis**.
-2. Beri nama: `growthcoder-redis`.
-3. Set password redis (atau biarkan default yang digenerate Coolify).
-4. Klik **Save** lalu klik **Start**.
-5. Catat host internal dan password redis tersebut.
+1. Di Dashboard Coolify, masuk ke menu **Projects** (di sidebar kiri) -> Pilih Environment **production** -> Klik **+ New Resource**.
+2. Pilih kartu **PostgreSQL** (Bisa pilih **PostgreSQL 16** atau **PostgreSQL 18 Default**).
+3. Pada halaman konfigurasi PostgreSQL:
+   - **Name:** Ganti nama acak menjadi: `growthcoder-postgres`.
+   - **Username:** `postgres` (atau `growthcoder_user`).
+   - **Password:** Klik ikon mata 👁️ untuk melihat & menyalin password otomatis. **Catat di Notepad.**
+   - **Initial database:** Ganti menjadi `growthcoder_db`.
+   - **Postgres URL (internal):** Klik ikon mata 👁️ lalu salin seluruh URL internal (contoh: `postgres://postgres:password@postgresql-xxx:5432/growthcoder_db`). **Catat di Notepad.**
+   - **Public access:** Pastikan tetap **Private**.
+4. Klik **Save**, lalu klik **Start**. Tunggu hingga statusnya **Running (Hijau)**.
 
 ---
 
-## 5. Deploy Backend API (`apps/api`)
+### B. Membuat Redis
 
-Backend API akan memproses migrasi database otomatis, menjalankan background queue worker (BullMQ), serta melayani endpoint API dan file media.
+1. Di dalam Project yang sama, klik **+ New Resource** -> Pilih **Redis**.
+2. Pada halaman konfigurasi Redis:
+   - **Name:** `growthcoder-redis`.
+   - **Username:** `default`.
+   - **Password:** Salin teks password yang digenerate Coolify. **Catat di Notepad.**
+   - **Redis URL (internal):** Klik ikon mata 👁️ lalu salin URL internalnya. **Catat di Notepad.**
+   - **Public access:** Pastikan tetap **Private**.
+3. Klik **Save**, lalu klik **Start**. Tunggu hingga statusnya **Running (Hijau)**.
 
-1. Di Dashboard Coolify, klik **+ New Resource** -> **Private / Public Repository (GitHub)**.
-2. Pilih repository `growthcoder-portfolio-v2`, branch `main`.
-3. Di pengaturan aplikasi:
-   - **Build Pack:** `Dockerfile`
-   - **Base Directory:** `/` _(Penting: Biarkan `/` agar context pnpm workspace terbaca)_
-   - **Dockerfile Location:** `apps/api/Dockerfile`
-   - **Domains:**
+---
+
+## 5. Menghubungkan GitHub App ke Coolify
+
+*(Proses ini hanya dilakukan 1 kali untuk menghubungkan akun GitHub ke Coolify)*
+
+1. Di dalam Project, klik **+ New Resource** -> Pilih kartu **Git Repository (with GitHub App)**.
+2. Klik tombol **`Deploy →`** pada kartu tersebut.
+3. Di modal **New GitHub App**:
+   - **Name:** Masukkan nama yang **unik secara global** (misal: `coolify-growthcoder-<nama-anda>`).
+   - Biarkan field lainnya default, lalu klik **Continue**.
+4. Di halaman **Automated installation** (sebelah kiri):
+   - Klik tombol ungu **`Register with GitHub`**.
+5. Anda akan diarahkan ke GitHub:
+   - Jika muncul error nama sudah terpakai, tambahkan angka/nama unik di kolom nama GitHub App.
+   - Klik tombol hijau **`Create GitHub App for [Akun Anda]`**.
+6. Kembali ke Coolify, klik tombol ungu **`Install repositories`**:
+   - Pilih akun Anda di GitHub.
+   - Pilih opsi **"Only select repositories"** -> centang repository `growthcoder-portfolio-v2` (atau *All repositories*).
+   - Klik **Install & Authorize**.
+7. GitHub App sekarang sudah terhubung penuh ke Coolify!
+
+---
+
+## 6. Deploy Backend API (`apps/api`)
+
+Backend API akan memproses migrasi database otomatis, menjalankan background queue worker (BullMQ), serta melayani endpoint REST API dan file media.
+
+### Langkah 1: Pilih Repository
+1. Masuk ke **Projects** -> **production** -> Klik **+ New Resource**.
+2. Pilih kartu **Git Repository (with GitHub App)**.
+3. Di kolom **Repository**, pilih: `M-IhsanMaulana/growthcoder-portfolio-v2` -> Klik **Load repository**.
+
+### Langkah 2: Build Configuration Awal
+Pada tampilan popup konfigurasi awal:
+- **Branch:** `main`
+- **Build pack:** Ubah dari *Railpack* menjadi **`Dockerfile`**.
+- **Port:** Ubah dari `3000` menjadi **`3333`**.
+- **Base directory:** Biarkan tetap **`/`** *(Penting: Jangan diubah agar pnpm workspace terbaca)*.
+- Klik **Continue**.
+
+### Langkah 3: Pengaturan Detail Aplikasi
+Setelah masuk ke dashboard aplikasi:
+
+1. **Tab General:**
+   - **Name:** Ubah menjadi `growthcoder-api`.
+   - **Build pipeline -> Dockerfile location:** Ubah menjadi **`apps/api/Dockerfile`**.
+   - **Internal access -> Exposed ports:** Pastikan port bernilai **`3333`** (klik *Edit networking* jika ingin mengubah).
+   - Klik **Save**.
+
+2. **Tab Domains (di sidebar kiri):**
+   - Masukkan kedua domain berikut (pisahkan dengan koma):
      ```text
      https://api.growthcoder.id, https://image.growthcoder.id
      ```
-   - **Exposed Port:** `3333`
-4. **Persistent Storage (Volume Uploads):**
-   - Buka tab **Storages** / **Persistent Storage**.
-   - Tambahkan storage volume:
+   - Klik **Save**.
+
+3. **Tab Persistent Storage (di sidebar kiri):**
+   - Klik **+ Add Persistent Storage**:
      - **Name:** `api-uploads`
      - **Destination Path:** `/app/storage/uploads`
-   - _(Hal ini memastikan semua gambar/file yang di-upload tidak hilang saat redeploy container)._
-5. **Environment Variables:**
-   Buka tab **Environment Variables** dan tambahkan nilai-nilai berikut:
+   - Klik **Save**.
 
-   ```env
-   # Node & Runtime
-   NODE_ENV=production
-   PORT=3333
-   HOST=0.0.0.0
-   LOG_LEVEL=info
+4. **Tab Environment Variables (di sidebar kiri):**
+   - Tambahkan variabel-variabel berikut (sesuaikan password Postgres & Redis):
 
-   # App Secrets
-   APP_KEY=isi_dengan_random_32_karakter_string_rahasia
-   APP_URL=https://api.growthcoder.id
+```env
+NODE_ENV=production
+PORT=3333
+HOST=0.0.0.0
+LOG_LEVEL=info
+APP_KEY=isi_string_acak_rahasia_minimal_32_karakter
 
-   # Session
-   SESSION_DRIVER=cookie
+# URL Publik & Storage
+APP_URL=https://api.growthcoder.id
+IMAGE_BASE_URL=https://image.growthcoder.id
+STORAGE_DRIVER=local
 
-   # Database Connection (Gunakan Host Internal dari PostgreSQL Coolify)
-   DB_CONNECTION=pg
-   DB_HOST=postgresql-growthcoder
-   DB_PORT=5442
-   DB_USER=growthcoder_user
-   DB_PASSWORD=password_db_anda
-   DB_DATABASE=growthcoder_db
+# CORS & Allowed Origins
+CORS_ENABLED=true
+ALLOWED_ORIGINS=https://growthcoder.id,https://www.growthcoder.id,https://admin.growthcoder.id
 
-   # Redis & Queue Worker (Gunakan Host Internal dari Redis Coolify)
-   REDIS_HOST=redis-growthcoder
-   REDIS_PORT=6379
-   REDIS_PASSWORD=password_redis_anda
-   REDIS_DB=0
+# PostgreSQL Connection (Gunakan detail dari Langkah 4A)
+DB_HOST=growthcoder-postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=<PASSWORD_POSTGRES_DARI_LANGKAH_4A>
+DB_DATABASE=growthcoder_db
 
-   # Storage Driver
-   DRIVE_DISK=local
+# Redis Connection (Gunakan detail dari Langkah 4B)
+REDIS_HOST=growthcoder-redis
+REDIS_PORT=6379
+REDIS_PASSWORD=<PASSWORD_REDIS_DARI_LANGKAH_4B>
 
-   # Telegram Notifications (Opsional)
-   TELEGRAM_BOT_TOKEN=
-   TELEGRAM_CHAT_ID=
-   ```
+# Passkeys WebAuthn Admin CMS
+RP_NAME=GrowthCoder Admin
+RP_ID=growthcoder.id
+ORIGIN=https://admin.growthcoder.id
+```
 
-6. Klik **Save** -> Klik **Deploy**.
-
-> [!TIP]
-> **Generate APP_KEY:** Anda bisa membuat string random 32 karakter untuk `APP_KEY` dengan menjalankan perintah `openssl rand -base64 32` di terminal.
+5. **Deploy:**
+   - Klik tombol **Deploy** di kanan atas.
+   - Tunggu hingga proses build selesai dan container berstatus **Running (Hijau)**.
 
 ---
 
-## 6. Deploy Frontend Web (`apps/web`)
+## 7. Deploy Frontend Web (`apps/web`)
 
-1. Di Dashboard Coolify, klik **+ New Resource** -> **GitHub Repository**.
-2. Pilih repository `growthcoder-portfolio-v2`, branch `main`.
-3. Pengaturan aplikasi:
-   - **Build Pack:** `Dockerfile`
-   - **Base Directory:** `/`
-   - **Dockerfile Location:** `apps/web/Dockerfile`
-   - **Domains:**
-     ```text
-     https://growthcoder.id, https://www.growthcoder.id
-     ```
-   - **Exposed Port:** `3000`
-4. **Environment Variables:**
+1. Di Dashboard Coolify, masuk ke **Projects** -> **production** -> Klik **+ New Resource**.
+2. Pilih **Git Repository (with GitHub App)** -> Pilih repository `growthcoder-portfolio-v2` -> Klik **Load repository**.
+3. **Build configuration awal:**
+   - **Branch:** `main`
+   - **Build pack:** `Dockerfile`
+   - **Port:** `3000`
+   - **Base directory:** `/`
+   - Klik **Continue**.
+4. **Pengaturan detail:**
+   - **Name:** `growthcoder-web`
+   - **Dockerfile location:** `apps/web/Dockerfile`
+   - **Domains tab:** `https://growthcoder.id, https://www.growthcoder.id`
+   - **Exposed port:** `3000`
+5. **Environment Variables tab:**
    ```env
    NODE_ENV=production
    PORT=3000
@@ -222,35 +270,37 @@ Backend API akan memproses migrasi database otomatis, menjalankan background que
    NEXT_PUBLIC_MEDIA_URL=https://image.growthcoder.id
    NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
    ```
-5. Klik **Save** -> Klik **Deploy**.
+6. Klik **Save** -> Klik **Deploy**.
 
 ---
 
-## 7. Deploy Admin CMS (`apps/cms`)
+## 8. Deploy Admin CMS (`apps/cms`)
 
-1. Di Dashboard Coolify, klik **+ New Resource** -> **GitHub Repository**.
-2. Pilih repository `growthcoder-portfolio-v2`, branch `main`.
-3. Pengaturan aplikasi:
-   - **Build Pack:** `Dockerfile`
-   - **Base Directory:** `/`
-   - **Dockerfile Location:** `apps/cms/Dockerfile`
-   - **Domains:**
-     ```text
-     https://admin.growthcoder.id
-     ```
-   - **Exposed Port:** `3001`
-4. **Environment Variables:**
+1. Di Dashboard Coolify, masuk ke **Projects** -> **production** -> Klik **+ New Resource**.
+2. Pilih **Git Repository (with GitHub App)** -> Pilih repository `growthcoder-portfolio-v2` -> Klik **Load repository**.
+3. **Build configuration awal:**
+   - **Branch:** `main`
+   - **Build pack:** `Dockerfile`
+   - **Port:** `3001`
+   - **Base directory:** `/`
+   - Klik **Continue**.
+4. **Pengaturan detail:**
+   - **Name:** `growthcoder-cms`
+   - **Dockerfile location:** `apps/cms/Dockerfile`
+   - **Domains tab:** `https://admin.growthcoder.id`
+   - **Exposed port:** `3001`
+5. **Environment Variables tab:**
    ```env
    NODE_ENV=production
    PORT=3001
    NEXT_PUBLIC_API_URL=https://api.growthcoder.id
    NEXT_PUBLIC_MEDIA_URL=https://image.growthcoder.id
    ```
-5. Klik **Save** -> Klik **Deploy**.
+6. Klik **Save** -> Klik **Deploy**.
 
 ---
 
-## 8. Verifikasi CI/CD & Auto Deploy
+## 9. Verifikasi CI/CD & Auto Deploy
 
 ### A. Verifikasi Status Aplikasi
 
@@ -261,7 +311,7 @@ Backend API akan memproses migrasi database otomatis, menjalankan background que
 
 ### B. Menguji Alur Auto Deploy (CI/CD)
 
-1. Di Coolify, pada setiap aplikasi (Web, CMS, API), pastikan opsi **Auto Deploy on Git Push** dalam keadaan aktif (Centang _"Enable automatic deployments"_).
+1. Di Coolify, pada setiap aplikasi (Web, CMS, API), pastikan opsi **Auto Deploy on Git Push** aktif.
 2. Lakukan perubahan kecil pada kode di komputer lokal Anda, misalnya update teks di `apps/web`.
 3. Commit dan push ke GitHub:
    ```bash
@@ -273,7 +323,7 @@ Backend API akan memproses migrasi database otomatis, menjalankan background que
 
 ---
 
-## 9. Panduan Migrasi Masa Depan ke Cloudflare R2
+## 10. Panduan Migrasi Masa Depan ke Cloudflare R2
 
 Jika di kemudian hari ukuran media/gambar bertambah besar dan Anda ingin memindahkannya ke Cloudflare R2 (Object Storage):
 
@@ -285,7 +335,7 @@ Jika di kemudian hari ukuran media/gambar bertambah besar dan Anda ingin meminda
 ### Langkah 2: Buat API Token R2
 
 1. Di Cloudflare R2, buka **Manage R2 API Tokens** -> **Create API Token** (dengan hak akses _Object Read & Write_).
-2. Dapatkan:
+2. Dapatkan kredensial:
    - `AWS_ACCESS_KEY_ID`
    - `AWS_SECRET_ACCESS_KEY`
    - `AWS_ENDPOINT` (`https://<ACCOUNT_ID>.r2.cloudflarestorage.com`)
@@ -296,7 +346,7 @@ Jika di kemudian hari ukuran media/gambar bertambah besar dan Anda ingin meminda
 Ubah env di aplikasi `apps/api`:
 
 ```env
-DRIVE_DISK=s3
+STORAGE_DRIVER=s3
 AWS_ACCESS_KEY_ID=token_access_key_anda
 AWS_SECRET_ACCESS_KEY=token_secret_key_anda
 AWS_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
