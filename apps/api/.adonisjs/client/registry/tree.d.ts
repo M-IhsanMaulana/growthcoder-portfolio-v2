@@ -45,6 +45,7 @@ export interface ApiDefinition {
     store: typeof routes['admin_articles.store']
     publishScheduled: typeof routes['admin_articles.publish_scheduled']
     show: typeof routes['admin_articles.show']
+    previewUrl: typeof routes['admin_articles.preview_url']
     analytics: typeof routes['admin_articles.analytics']
     update: typeof routes['admin_articles.update']
     destroy: typeof routes['admin_articles.destroy']

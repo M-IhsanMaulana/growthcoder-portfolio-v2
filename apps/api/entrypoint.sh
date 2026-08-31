@@ -15,9 +15,13 @@ fi
 
 $ACE_CMD migration:run --force || echo "==> [Warning] Database migration completed or already up to date."
 
-# 2. Run initial database seeds (Admin user, settings, taxanomies)
-echo "==> Running database seeders..."
-$ACE_CMD db:seed || echo "==> [Warning] Database seeding completed or skipped."
+# 2. Run initial database seeds ONLY if RUN_SEEDERS=true is explicitly set
+if [ "$RUN_SEEDERS" = "true" ]; then
+  echo "==> Running database seeders (RUN_SEEDERS=true)..."
+  $ACE_CMD db:seed || echo "==> [Warning] Database seeding completed or skipped."
+else
+  echo "==> Skipping database seeders (database already initialized)."
+fi
 
 # 3. Start BullMQ background queue worker
 echo "==> Starting BullMQ background queue worker..."

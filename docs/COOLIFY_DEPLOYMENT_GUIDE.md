@@ -242,6 +242,10 @@ REDIS_PASSWORD=<PASSWORD_REDIS_DARI_LANGKAH_4B>
 RP_NAME=GrowthCoder Admin
 RP_ID=growthcoder.id
 ORIGIN=https://admin.growthcoder.id
+
+# Frontend Web ISR On-Demand Revalidation
+WEB_URL=https://growthcoder.id
+REVALIDATE_SECRET=growthcoder-revalidate-secret
 ```
 
 5. **Deploy:**
@@ -273,6 +277,7 @@ ORIGIN=https://admin.growthcoder.id
    NEXT_PUBLIC_API_URL=https://api.growthcoder.id
    NEXT_PUBLIC_MEDIA_URL=https://image.growthcoder.id
    NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+   REVALIDATE_SECRET=growthcoder-revalidate-secret
    ```
 6. Klik **Save** -> Klik **Deploy**.
 

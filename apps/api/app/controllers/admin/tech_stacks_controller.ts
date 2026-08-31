@@ -5,6 +5,7 @@ import {
   updateTechStackValidator,
 } from '#validators/tech_stack_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import stringHelpers from '@adonisjs/core/helpers/string'
 
 export default class TechStacksController {
@@ -49,6 +50,7 @@ export default class TechStacksController {
     })
 
     ActivityLogService.log(ctx, 'create', 'tech_stack', techStack.id, { name: techStack.name })
+    await RevalidateService.revalidate('tech-stacks')
 
     return response.created({
       success: true,
@@ -80,6 +82,7 @@ export default class TechStacksController {
     await techStack.save()
 
     ActivityLogService.log(ctx, 'update', 'tech_stack', techStack.id, { name: techStack.name })
+    await RevalidateService.revalidate('tech-stacks')
 
     return response.ok({
       success: true,
@@ -97,6 +100,7 @@ export default class TechStacksController {
     await techStack.delete()
 
     ActivityLogService.log(ctx, 'delete', 'tech_stack', id, { name })
+    await RevalidateService.revalidate('tech-stacks')
 
     return response.ok({
       success: true,
@@ -104,3 +108,4 @@ export default class TechStacksController {
     })
   }
 }
+

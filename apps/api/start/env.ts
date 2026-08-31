@@ -54,4 +54,14 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Telegram Notifications Fallback
   TELEGRAM_BOT_TOKEN: Env.schema.string.optional(),
   TELEGRAM_CHAT_ID: Env.schema.string.optional(),
+
+  // Frontend Web ISR Revalidation
+  WEB_URL: Env.schema.string.optional(),
+  REVALIDATE_SECRET: Env.schema.string.optional(),
+
+  // Passkeys WebAuthn
+  RP_NAME: Env.schema.string.optional(),
+  RP_ID: Env.schema.string.optional(),
+  ORIGIN: Env.schema.string.optional(),
 })
+

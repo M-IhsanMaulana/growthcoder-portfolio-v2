@@ -144,7 +144,7 @@ export default class TechStackSeeder extends BaseSeeder {
     ]
 
     for (const stack of stacks) {
-      await TechStack.updateOrCreate({ slug: stack.slug }, stack)
+      await TechStack.firstOrCreate({ slug: stack.slug }, stack)
     }
   }
 }

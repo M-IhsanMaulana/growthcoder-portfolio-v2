@@ -174,6 +174,12 @@ const routes = {
     tokens: [{"old":"/api/admin/articles/:id","type":0,"val":"api","end":""},{"old":"/api/admin/articles/:id","type":0,"val":"admin","end":""},{"old":"/api/admin/articles/:id","type":0,"val":"articles","end":""},{"old":"/api/admin/articles/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin_articles.show']['types'],
   },
+  'admin_articles.preview_url': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/admin/articles/:id/preview-url',
+    tokens: [{"old":"/api/admin/articles/:id/preview-url","type":0,"val":"api","end":""},{"old":"/api/admin/articles/:id/preview-url","type":0,"val":"admin","end":""},{"old":"/api/admin/articles/:id/preview-url","type":0,"val":"articles","end":""},{"old":"/api/admin/articles/:id/preview-url","type":1,"val":"id","end":""},{"old":"/api/admin/articles/:id/preview-url","type":0,"val":"preview-url","end":""}],
+    types: placeholder as Registry['admin_articles.preview_url']['types'],
+  },
   'admin_articles.analytics': {
     methods: ["GET","HEAD"],
     pattern: '/api/admin/articles/:id/analytics',

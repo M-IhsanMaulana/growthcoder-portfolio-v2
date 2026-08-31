@@ -343,6 +343,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/articles_controller').default['show']>>>
     }
   }
+  'admin_articles.preview_url': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/admin/articles/:id/preview-url'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/articles_controller').default['previewUrl']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/articles_controller').default['previewUrl']>>>
+    }
+  }
   'admin_articles.analytics': {
     methods: ["GET","HEAD"]
     pattern: '/api/admin/articles/:id/analytics'

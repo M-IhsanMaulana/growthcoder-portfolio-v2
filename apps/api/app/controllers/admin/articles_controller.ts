@@ -220,7 +220,8 @@ export default class ArticlesController {
 
   async previewUrl({ params, response }: HttpContext) {
     const post = await Post.query().where('id', params.id).firstOrFail()
-    const appKey = env.get('APP_KEY') || 'growthcoder-default-secret-key'
+    const rawAppKey = env.get('APP_KEY')
+    const appKey = typeof rawAppKey === 'string' ? rawAppKey : (rawAppKey?.release() || 'growthcoder-default-secret-key')
     const token = createHmac('sha256', appKey).update(`${post.slug}:preview`).digest('hex')
     const siteUrl = env.get('FRONTEND_URL') || env.get('SITE_URL') || 'https://growthcoder.id'
     const previewUrl = `${siteUrl.replace(/\/$/, '')}/blog/${post.slug}?preview=true&token=${token}`

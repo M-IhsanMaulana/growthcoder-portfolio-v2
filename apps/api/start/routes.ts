@@ -236,9 +236,23 @@ router
     router.delete('security/sessions/:id', [AdminSecurityController, 'revokeSession'])
     router.post('security/sessions/revoke-others', [AdminSecurityController, 'revokeOtherSessions'])
     router.put('security/password', [AdminSecurityController, 'updatePassword'])
+
+    // 12. Manual Web Cache Revalidation
+    router.post('revalidate', async ({ request, response }) => {
+      const { RevalidateService } = await import('#services/revalidate_service')
+      const tag = request.input('tag')
+      const result = await RevalidateService.revalidate(tag)
+      return response.ok({
+        success: result.success,
+        message: result.success
+          ? `Cache revalidation '${tag || 'all'}' berhasil dikirim ke frontend Next.js`
+          : `Gagal revalidasi cache: ${result.message}`,
+      })
+    })
   })
   .prefix('/api/admin')
   .use(middleware.auth({ guards: ['api'] }))
+
 
 // ==========================================
 // 3. PUBLIC READ-ONLY REST API ROUTES (/api/v1)

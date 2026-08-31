@@ -101,7 +101,7 @@ export default class SettingSeeder extends BaseSeeder {
     ]
 
     for (const setting of defaultSettings) {
-      await SiteSetting.updateOrCreate({ key: setting.key }, setting)
+      await SiteSetting.firstOrCreate({ key: setting.key }, setting)
     }
   }
 }

@@ -9,9 +9,51 @@ import type User from '#models/user'
 import UserPasskey from '#models/user_passkey'
 import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/types'
 
-const RP_NAME = 'GrowthCoder Portfolio'
-const RP_ID = env.get('HOST', 'localhost')
-const ORIGIN = env.get('APP_URL', 'http://localhost:3333')
+function getRpId(): string {
+  const envRpId = process.env.RP_ID || env.get('RP_ID')
+  if (envRpId && envRpId !== '0.0.0.0' && envRpId !== '127.0.0.1') {
+    return envRpId
+  }
+
+  const host = env.get('HOST', 'localhost')
+  if (host === '0.0.0.0' || host === '127.0.0.1') {
+    return 'localhost'
+  }
+  return host || 'localhost'
+}
+
+function getRpName(): string {
+  return process.env.RP_NAME || env.get('RP_NAME') || 'GrowthCoder Admin'
+}
+
+function getExpectedOrigins(): string[] {
+  const origins = new Set<string>([
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'https://admin.growthcoder.id',
+    'https://growthcoder.id',
+    'https://www.growthcoder.id',
+  ])
+
+  const originEnv = process.env.ORIGIN || env.get('ORIGIN')
+  if (originEnv) {
+    originEnv.split(',').forEach((o) => origins.add(o.trim()))
+  }
+
+  const allowedOrigins = process.env.ALLOWED_ORIGINS || env.get('ALLOWED_ORIGINS')
+  if (allowedOrigins) {
+    allowedOrigins.split(',').forEach((o) => origins.add(o.trim()))
+  }
+
+  const appUrl = env.get('APP_URL')
+  if (appUrl) {
+    origins.add(appUrl)
+  }
+
+  return Array.from(origins).filter(Boolean)
+}
 
 export class PasskeyService {
   /**
@@ -21,10 +63,12 @@ export class PasskeyService {
     await user.load('passkeys')
 
     const userPasskeys = user.passkeys || []
+    const rpID = getRpId()
+    const rpName = getRpName()
 
     const options = await generateRegistrationOptions({
-      rpName: RP_NAME,
-      rpID: RP_ID,
+      rpName,
+      rpID,
       userID: new TextEncoder().encode(user.id),
       userName: user.email,
       userDisplayName: user.name,
@@ -51,17 +95,14 @@ export class PasskeyService {
     response: RegistrationResponseJSON,
     deviceName?: string
   ) {
+    const rpID = getRpId()
+    const expectedOrigin = getExpectedOrigins()
+
     const verification = await verifyRegistrationResponse({
       response,
       expectedChallenge,
-      expectedOrigin: [
-        ORIGIN,
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-      ],
-      expectedRPID: RP_ID,
+      expectedOrigin,
+      expectedRPID: rpID,
     })
 
     if (!verification.verified || !verification.registrationInfo) {
@@ -96,8 +137,10 @@ export class PasskeyService {
       }))
     }
 
+    const rpID = getRpId()
+
     const options = await generateAuthenticationOptions({
-      rpID: RP_ID,
+      rpID,
       allowCredentials,
       userVerification: 'preferred',
     })
@@ -121,17 +164,14 @@ export class PasskeyService {
       throw new Error('Passkey credential not found')
     }
 
+    const rpID = getRpId()
+    const expectedOrigin = getExpectedOrigins()
+
     const verification = await verifyAuthenticationResponse({
       response,
       expectedChallenge,
-      expectedOrigin: [
-        ORIGIN,
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-      ],
-      expectedRPID: RP_ID,
+      expectedOrigin,
+      expectedRPID: rpID,
       credential: {
         id: passkey.credentialId,
         publicKey: Buffer.from(passkey.publicKey, 'base64'),
@@ -154,3 +194,4 @@ export class PasskeyService {
     return passkey.user
   }
 }
+

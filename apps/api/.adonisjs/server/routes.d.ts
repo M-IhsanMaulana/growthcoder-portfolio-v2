@@ -32,6 +32,7 @@ export type ScannedRoutes = {
     'admin_articles.store': { paramsTuple?: []; params?: {} }
     'admin_articles.publish_scheduled': { paramsTuple?: []; params?: {} }
     'admin_articles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_articles.preview_url': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.analytics': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -147,6 +148,7 @@ export type ScannedRoutes = {
     'admin_project_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.index': { paramsTuple?: []; params?: {} }
     'admin_articles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_articles.preview_url': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.analytics': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_categories.index': { paramsTuple?: []; params?: {} }
     'admin_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -209,6 +211,7 @@ export type ScannedRoutes = {
     'admin_project_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.index': { paramsTuple?: []; params?: {} }
     'admin_articles.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_articles.preview_url': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_articles.analytics': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_categories.index': { paramsTuple?: []; params?: {} }
     'admin_categories.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

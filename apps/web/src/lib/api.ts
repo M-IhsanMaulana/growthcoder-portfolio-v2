@@ -1787,7 +1787,7 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/settings`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["settings", "site"] },
       },
     );
 
@@ -1861,7 +1861,7 @@ export async function getExpertises(): Promise<Expertise[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/expertises`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["expertises", "site"] },
       },
     );
 
@@ -1891,7 +1891,7 @@ export async function getFeaturedProjects(): Promise<Project[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects?featured=true`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["projects", "site"] },
       },
     );
 
@@ -1921,7 +1921,7 @@ export async function getTechStacks(): Promise<TechStack[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/tech-stacks`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["tech-stacks", "site"] },
       },
     );
 
@@ -1951,7 +1951,7 @@ export async function getCareerTimeline(): Promise<Experience[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/experiences`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["career", "site"] },
       },
     );
 
@@ -1991,7 +1991,7 @@ export async function getCareerAndEducation(): Promise<{
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/experiences`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["career", "site"] },
       },
     );
 
@@ -2059,7 +2059,7 @@ export async function getPhilosophies(): Promise<DevelopmentPhilosophy[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/philosophies`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["career", "site"] },
       },
     );
 
@@ -2089,7 +2089,7 @@ export async function getLatestArticles(limit: number = 3): Promise<Article[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles?limit=${limit}`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["articles", "site"] },
       },
     );
 
@@ -2131,7 +2131,7 @@ export async function getAllProjects(
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects${queryString}`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["projects", "site"] },
       },
     );
 
@@ -2224,7 +2224,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/projects/${encodeURIComponent(slug)}`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["projects", `project-${slug}`, "site"] },
       },
     );
 
@@ -2254,7 +2254,7 @@ export async function getProjectCategories(): Promise<ProjectCategory[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/project-categories`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["projects", "site"] },
       },
     );
 
@@ -2344,7 +2344,7 @@ export async function getAllArticles(
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles${queryString}`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["articles", "site"] },
       },
     );
 
@@ -2449,7 +2449,9 @@ export async function getArticleBySlug(
     const endpoint = `${API_BASE_URL.replace(/\/$/, "")}/api/v1/articles/${encodeURIComponent(slug)}${queryString ? `?${queryString}` : ""}`;
 
     const res = await safeFetch(endpoint, {
-      ...(isPreview ? { cache: "no-store" } : { next: { revalidate: 60 } }),
+      ...(isPreview
+        ? { cache: "no-store" }
+        : { next: { revalidate: 3600, tags: ["articles", `article-${slug}`, "site"] } }),
     });
 
     if (!res.ok) {
@@ -2499,7 +2501,7 @@ export async function getArticleCategories(): Promise<Category[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/categories?status=published`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["articles", "site"] },
       },
     );
 
@@ -2523,7 +2525,7 @@ export async function getArticleTags(): Promise<Tag[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/tags?status=published`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["articles", "site"] },
       },
     );
 
@@ -2664,35 +2666,35 @@ export const FALLBACK_SERVICES: Service[] = [
   },
   {
     id: "srv-02",
-    title: "Backend API Architecture & Database Engineering",
-    slug: "backend-api-database",
+    title: "High-Performance Backend & RESTful API Architecture",
+    slug: "backend-api-architecture",
     shortDescription:
-      "Perancangan backend RESTful API yang scalable, optimasi skema database relasional PostgreSQL, dan sistem otentikasi yang aman.",
-    valueProposition: "Arsitektur Bersih, Transaksi Aman, & Skalabel",
+      "Perancangan backend modular, skalabel, dan aman dengan AdonisJS, PostgreSQL, Redis Caching, dan autentikasi Passkey / JWT.",
+    valueProposition: "Skalabel, Terstruktur, & Aman",
     iconSvg: "Server",
     deliverables: [
-      "Arsitektur RESTful API standar OpenAPI/Swagger",
-      "Otentikasi Modern (JWT, Session, Passkeys WebAuthn, OAuth2)",
-      "Skema Relasional PostgreSQL/MySQL dengan ACID compliance",
-      "Rate Limiting, CORS, Payload Sanitization, dan Proteksi OWASP",
-      "Background Queue Jobs & Scheduled Workers (BullMQ / Redis)",
-      "Audit performa query database & query profiling",
+      "Perancangan arsitektur backend modular berbasis AdonisJS v6 / Node.js",
+      "Optimasi skema database PostgreSQL, indexing, dan migrasi terstruktur",
+      "Mekanisme caching layer berkecepatan tinggi dengan Redis",
+      "Autentikasi aman WebAuthn (Passkeys) & Session/Token Management",
+      "Integrasi API pihak ketiga (Payment Gateway, Telegram, Storage S3)",
+      "Automated Testing & Unit Test Coverage",
     ],
     faqs: [
       {
-        id: "faq-04",
+        id: "faq-03",
         serviceId: "srv-02",
-        question: "Database apa saja yang didukung?",
+        question: "Framework dan database apa yang biasa Anda gunakan?",
         answer:
-          "Fokus utama keahlian saya adalah PostgreSQL (termasuk JSONB dan indexing optimal), MySQL, SQLite, dan Redis untuk in-memory caching.",
+          "Saya utamanya menggunakan AdonisJS v6 (TypeScript) dan PostgreSQL, didukung Redis untuk caching layer.",
         sortOrder: 1,
       },
       {
-        id: "faq-05",
+        id: "faq-04",
         serviceId: "srv-02",
-        question: "Bagaimana standar keamanan API yang diterapkan?",
+        question: "Apakah sistem backend yang dibangun sudah mendukung Docker?",
         answer:
-          "Saya menerapkan otentikasi modern terenkripsi, rate limiting, sanitasi input VineJS/Zod, CORS ketat, serta session token yang aman.",
+          "Ya, setiap proyek dilengkapi dengan konfigurasi multi-stage Dockerfile dan Docker Compose untuk kemudahan deployment.",
         sortOrder: 2,
       },
     ],
@@ -2799,14 +2801,14 @@ export const FALLBACK_WORKFLOW_STEPS: WorkflowStep[] = [
     title: "Desain Arsitektur & Antarmuka UI/UX",
     shortTitle: "Perancangan Solusi",
     description:
-      "Menyusun blueprint arsitektur backend, skema database relasional (ERD), kontrak API (OpenAPI), dan desain antarmuka modern yang ramah pengguna.",
+      "Merancang wireframe, flow interaksi antarmuka yang intuitif, serta arsitektur database dan schema kontrak API yang solid.",
     activities: [
-      "Perancangan ERD database & skema relasi ACID",
-      "Spesifikasi API endpoints & data transformers",
-      "Wireframe & komponen UI/UX responsif (Figma/Tailwind)",
-      "Penetapan standar keamanan data & otentikasi",
+      "Wireframing & prototipe antarmuka interaktif",
+      "Database modeling & ERD schema design",
+      "Perancangan OpenAPI contract & types",
+      "Penetapan security guidelines & role authorization",
     ],
-    iconSvg: "PenTool",
+    iconSvg: "Layout",
     order: 2,
     isActive: true,
     createdAt: "2026-01-01T00:00:00Z",
@@ -2815,15 +2817,15 @@ export const FALLBACK_WORKFLOW_STEPS: WorkflowStep[] = [
   {
     id: "wf-03",
     stepNumber: "03",
-    title: "Agile Development & QA Testing",
-    shortTitle: "Pengembangan Kode",
+    title: "Implementasi & Integrasi Sistem",
+    shortTitle: "Pengembangan Inti",
     description:
-      "Penulisan kode yang rapi dengan prinsip Clean Code, type safety, pengujian berkala, dan demo progres bertahap di setiap milestone.",
+      "Pengembangan fitur secara iteratif dengan clean code, type-safe end-to-end, dan integrasi mulus antara Next.js dan backend.",
     activities: [
-      "Iterasi teratur dengan live demo progress staging",
-      "Implementasi Next.js SSR + AdonisJS v6 REST API",
-      "Penulisan Unit & Functional Testing",
-      "Code review mandiri & standar kualitas ketat",
+      "Frontend rendering & interaksi animasi halus",
+      "Backend business logic & endpoint creation",
+      "Integrasi caching layer Redis & third-party services",
+      "Internal testing, QA linting & typechecking berkala",
     ],
     iconSvg: "Code2",
     order: 3,
@@ -2834,15 +2836,15 @@ export const FALLBACK_WORKFLOW_STEPS: WorkflowStep[] = [
   {
     id: "wf-04",
     stepNumber: "04",
-    title: "CI/CD Deployment & Serah Terima",
-    shortTitle: "Rilis & Pendampingan",
+    title: "Testing, Optimasi & Deployment",
+    shortTitle: "Uji Kualitas & Rilis",
     description:
-      "Peluncuran sistem ke server produksi (VPS / Cloud), konfigurasi deployment otomatis, serah terima repositori Git 100%, serta pendampingan pasca-rilis.",
+      "Uji coba menyeluruh pada berbagai ukuran layar, optimasi performa Core Web Vitals, dan deployment ke server produksi.",
     activities: [
-      "Setup automated CI/CD pipeline via GitHub Actions",
-      "Konfigurasi domain, SSL, dan proteksi Cloudflare",
-      "Penyerahan 100% hak akses Git repository & dokumentasi",
-      "Pendampingan teknis dan perbaikan bug pasca-rilis",
+      "Cross-browser testing & mobile responsiveness",
+      "Audit Lighthouse & PageSpeed optimization",
+      "Docker containerization & CI/CD deployment",
+      "Serah terima source code, kredensial & dokumentasi",
     ],
     iconSvg: "Rocket",
     order: 4,
@@ -2860,7 +2862,7 @@ export async function getWorkflowSteps(): Promise<WorkflowStep[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/workflows`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["services", "site"] },
       },
     );
 
@@ -2884,7 +2886,7 @@ export async function getServices(): Promise<Service[]> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/services`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["services", "site"] },
       },
     );
 
@@ -2908,7 +2910,7 @@ export async function getServiceBySlug(slug: string): Promise<Service | null> {
     const res = await safeFetch(
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/services/${slug}`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 3600, tags: ["services", `service-${slug}`, "site"] },
       },
     );
 

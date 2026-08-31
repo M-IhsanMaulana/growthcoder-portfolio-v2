@@ -383,6 +383,28 @@ export default function SettingsPage() {
     }
   };
 
+  const [isRevalidating, setIsRevalidating] = useState(false);
+
+  const handleRevalidate = async () => {
+    setIsRevalidating(true);
+    try {
+      const res = await apiClient.post<{ success: boolean; message: string }>(
+        "/api/admin/revalidate",
+        {},
+      );
+      if (res.success) {
+        toast.success("Cache frontend Next.js berhasil dibersihkan!");
+      } else {
+        toast.error(res.message || "Gagal membersihkan cache frontend");
+      }
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      toast.error(error.message || "Gagal menghubungi webhook revalidasi");
+    } finally {
+      setIsRevalidating(false);
+    }
+  };
+
   return (
     <div className="space-y-6 w-full pb-12">
       {/* Header */}
@@ -404,12 +426,25 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRevalidate}
+            disabled={isLoading || isSaving || isRevalidating}
+            className="text-xs h-9 border-dashed hover:border-primary/50 hover:text-primary"
+            title="Bersihkan cache frontend Next.js agar semua perubahan langsung tampil instan"
+          >
+            <Sparkles
+              className={`w-3.5 h-3.5 mr-1.5 ${isRevalidating ? "animate-spin" : ""}`}
+            />
+            {isRevalidating ? "Membersihkan..." : "Bersihkan Cache Web"}
+          </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={fetchSettings}
-            disabled={isLoading || isSaving}
+            disabled={isLoading || isSaving || isRevalidating}
             className="text-xs h-9"
           >
             <RefreshCw
@@ -419,7 +454,7 @@ export default function SettingsPage() {
           </Button>
           <Button
             onClick={handleSaveAll}
-            disabled={isLoading || isSaving}
+            disabled={isLoading || isSaving || isRevalidating}
             size="sm"
             className="text-xs h-9 bg-primary text-primary-foreground font-semibold shadow-xs"
           >

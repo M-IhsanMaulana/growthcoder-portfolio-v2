@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Expertise from '#models/expertise'
 import { expertiseValidator, reorderExpertiseValidator } from '#validators/expertise_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import stringHelpers from '@adonisjs/core/helpers/string'
 
 export default class ExpertisesController {
@@ -57,6 +58,7 @@ export default class ExpertisesController {
     await expertise.load('techStacks')
 
     ActivityLogService.log(ctx, 'create', 'expertise', expertise.id, { title: expertise.title })
+    await RevalidateService.revalidate('expertises')
 
     return response.created({
       success: true,
@@ -99,6 +101,7 @@ export default class ExpertisesController {
     await expertise.load('techStacks')
 
     ActivityLogService.log(ctx, 'update', 'expertise', expertise.id, { title: expertise.title })
+    await RevalidateService.revalidate('expertises')
 
     return response.ok({
       success: true,
@@ -113,6 +116,8 @@ export default class ExpertisesController {
     for (const item of payload.items) {
       await Expertise.query().where('id', item.id).update({ order: item.order })
     }
+
+    await RevalidateService.revalidate('expertises')
 
     return response.ok({
       success: true,
@@ -129,6 +134,7 @@ export default class ExpertisesController {
     await expertise.delete()
 
     ActivityLogService.log(ctx, 'delete', 'expertise', id, { title })
+    await RevalidateService.revalidate('expertises')
 
     return response.ok({
       success: true,
@@ -136,3 +142,4 @@ export default class ExpertisesController {
     })
   }
 }
+

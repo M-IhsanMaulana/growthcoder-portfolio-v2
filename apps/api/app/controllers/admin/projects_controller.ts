@@ -3,6 +3,7 @@ import Project from '#models/project'
 import ProjectGallery from '#models/project_gallery'
 import { createProjectValidator, updateProjectValidator } from '#validators/project_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import stringHelpers from '@adonisjs/core/helpers/string'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
@@ -103,6 +104,7 @@ export default class ProjectsController {
     await project.load('galleries')
 
     ActivityLogService.log(ctx, 'create', 'project', project.id, { title: project.title })
+    await RevalidateService.revalidate('projects')
 
     return response.created({
       success: true,
@@ -160,6 +162,7 @@ export default class ProjectsController {
     await project.load('galleries')
 
     ActivityLogService.log(ctx, 'update', 'project', project.id, { title: project.title })
+    await RevalidateService.revalidate('projects')
 
     return response.ok({
       success: true,
@@ -177,6 +180,7 @@ export default class ProjectsController {
     await project.delete()
 
     ActivityLogService.log(ctx, 'delete', 'project', id, { title })
+    await RevalidateService.revalidate('projects')
 
     return response.ok({
       success: true,
@@ -190,6 +194,8 @@ export default class ProjectsController {
     for (const item of items) {
       await Project.query().where('id', item.id).update({ order: item.order })
     }
+
+    await RevalidateService.revalidate('projects')
 
     return response.ok({
       success: true,

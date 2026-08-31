@@ -135,7 +135,8 @@ export default class ArticlesController {
 
     let isValidPreview = false
     if (isPreview && token) {
-      const appKey = env.get('APP_KEY') || 'growthcoder-default-secret-key'
+      const rawAppKey = env.get('APP_KEY')
+      const appKey = typeof rawAppKey === 'string' ? rawAppKey : (rawAppKey?.release() || 'growthcoder-default-secret-key')
       const expectedHmac = createHmac('sha256', appKey)
         .update(`${rawSlug}:preview`)
         .digest('hex')

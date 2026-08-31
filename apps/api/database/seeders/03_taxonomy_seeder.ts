@@ -39,7 +39,7 @@ export default class TaxonomySeeder extends BaseSeeder {
 
     const createdProjectCats: Record<string, ProjectCategory> = {}
     for (const cat of projectCats) {
-      const pc = await ProjectCategory.updateOrCreate({ slug: cat.slug }, cat)
+      const pc = await ProjectCategory.firstOrCreate({ slug: cat.slug }, cat)
       createdProjectCats[cat.slug] = pc
     }
 
@@ -69,7 +69,7 @@ export default class TaxonomySeeder extends BaseSeeder {
 
     const createdBlogCats: Record<string, Category> = {}
     for (const cat of blogCats) {
-      const bc = await Category.updateOrCreate({ slug: cat.slug }, cat)
+      const bc = await Category.firstOrCreate({ slug: cat.slug }, cat)
       createdBlogCats[cat.slug] = bc
     }
 
@@ -86,7 +86,7 @@ export default class TaxonomySeeder extends BaseSeeder {
 
     const createdTags: Record<string, Tag> = {}
     for (const tag of tags) {
-      const t = await Tag.updateOrCreate({ slug: tag.slug }, tag)
+      const t = await Tag.firstOrCreate({ slug: tag.slug }, tag)
       createdTags[tag.slug] = t
     }
 
@@ -96,7 +96,7 @@ export default class TaxonomySeeder extends BaseSeeder {
     const pgStack = await TechStack.findBy('slug', 'postgresql')
     const tsStack = await TechStack.findBy('slug', 'typescript')
 
-    const sampleProject = await Project.updateOrCreate(
+    const sampleProject = await Project.firstOrCreate(
       { slug: 'growthcoder-portfolio-v2' },
       {
         title: 'GrowthCoder Modern Monorepo Ecosystem',
@@ -134,7 +134,7 @@ Proyek ini memigrasikan sistem arsitektur lawas menjadi Full-Stack TypeScript Mo
     }
 
     // Seed Sample Blog Post
-    const samplePost = await Post.updateOrCreate(
+    const samplePost = await Post.firstOrCreate(
       { slug: 'membangun-fullstack-typescript-monorepo-modern' },
       {
         title: 'Membangun Full-Stack TypeScript Monorepo Modern dengan AdonisJS v6 dan Next.js',

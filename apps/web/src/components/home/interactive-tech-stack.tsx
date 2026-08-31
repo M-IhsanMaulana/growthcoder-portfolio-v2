@@ -12,6 +12,7 @@ import {
   Layers,
 } from "lucide-react";
 import type { TechStack, TechCategory } from "@growthcoder/types";
+import { getTechIconSvg } from "@/components/tech-stack-icon";
 
 interface InteractiveTechStackProps {
   techStacks: TechStack[];
@@ -101,56 +102,61 @@ export function InteractiveTechStack({
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
         >
           <AnimatePresence mode="popLayout">
-            {filteredStacks.map((tech) => (
-              <motion.div
-                key={tech.id || tech.slug}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.25 }}
-                whileHover={{ y: -5, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl p-4 sm:p-5 flex flex-col items-center text-center justify-center gap-3 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-emerald-500/40 transition-all duration-300 cursor-pointer select-none"
-              >
-                {/* Featured Star Badge */}
-                {tech.isFeatured && (
-                  <div className="absolute top-2.5 right-2.5">
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span
-                        className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
-                        title="Core Specialization"
-                      ></span>
+            {filteredStacks.map((tech) => {
+              const iconSvg = getTechIconSvg(tech);
+
+              return (
+                <motion.div
+                  key={tech.id || tech.slug}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.25 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl p-4 sm:p-5 flex flex-col items-center text-center justify-center gap-3 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-emerald-500/40 transition-all duration-300 cursor-pointer select-none"
+                >
+                  {/* Featured Star Badge */}
+                  {tech.isFeatured && (
+                    <div className="absolute top-2.5 right-2.5">
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span
+                          className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
+                          title="Core Specialization"
+                        ></span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* SVG Icon or Fallback Icon with Monochrome default -> Color on hover */}
+                  <div className="h-12 w-12 rounded-xl bg-muted/60 border border-border/40 p-2 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300">
+                    {iconSvg ? (
+                      <div
+                        className="h-8 w-8 flex items-center justify-center [&>svg]:h-full [&>svg]:w-full filter grayscale opacity-65 contrast-125 dark:opacity-75 transition-all duration-300 ease-out group-hover:filter-none group-hover:grayscale-0 group-hover:opacity-100 group-hover:contrast-100"
+                        dangerouslySetInnerHTML={{ __html: iconSvg }}
+                      />
+                    ) : (
+                      <Layers className="h-6 w-6 text-muted-foreground/70 group-hover:text-primary transition-colors duration-300" />
+                    )}
+                  </div>
+
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold font-heading text-foreground group-hover:text-primary transition-colors">
+                      {tech.name}
+                    </h3>
+                    <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider block mt-0.5">
+                      {tech.category}
                     </span>
                   </div>
-                )}
-
-                {/* SVG Icon or Fallback Icon */}
-                <div className="h-12 w-12 rounded-xl bg-muted/80 p-2 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-200">
-                  {tech.iconSvg ? (
-                    <div
-                      className="h-8 w-8 flex items-center justify-center [&>svg]:h-full [&>svg]:w-full"
-                      dangerouslySetInnerHTML={{ __html: tech.iconSvg }}
-                    />
-                  ) : (
-                    <Layers className="h-6 w-6 text-primary" />
-                  )}
-                </div>
-
-                <div>
-                  <h3 className="text-xs sm:text-sm font-bold font-heading text-foreground group-hover:text-primary transition-colors">
-                    {tech.name}
-                  </h3>
-                  <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider block mt-0.5">
-                    {tech.category}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </motion.div>
       </div>
     </section>
   );
 }
+

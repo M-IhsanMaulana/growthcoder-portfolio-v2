@@ -3,6 +3,7 @@ import SiteSetting from '#models/site_setting'
 import { updateSettingValidator, updateBulkSettingsValidator } from '#validators/setting_validator'
 import { ActivityLogService } from '#services/activity_log_service'
 import { CryptoService } from '#services/crypto_service'
+import { RevalidateService } from '#services/revalidate_service'
 
 export default class SettingsController {
   async index({ response }: HttpContext) {
@@ -69,6 +70,7 @@ export default class SettingsController {
     const setting = await SiteSetting.updateOrCreate({ key: payload.key }, { value })
 
     ActivityLogService.log(ctx, 'setting_change', 'site_setting', setting.id, { key: payload.key })
+    await RevalidateService.revalidate('settings')
 
     return response.ok({
       success: true,
@@ -112,6 +114,7 @@ export default class SettingsController {
     ActivityLogService.log(ctx, 'setting_change', 'site_settings_bulk', null, {
       keys: Object.keys(payload.settings),
     })
+    await RevalidateService.revalidate('settings')
 
     return response.ok({
       success: true,
