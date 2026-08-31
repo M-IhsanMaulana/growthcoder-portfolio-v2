@@ -192,7 +192,7 @@ export default async function ProjectDetailPage({
           </div>
 
           {/* Main Cover Showcase Banner */}
-          <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-3xl overflow-hidden border border-border/70 bg-muted mb-12 sm:mb-16 shadow-lg">
+          <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden border border-border/70 bg-muted mb-12 sm:mb-16 shadow-lg">
             {project.coverImage ? (
               <Image
                 src={project.coverImage}
@@ -200,7 +200,7 @@ export default async function ProjectDetailPage({
                 fill
                 priority
                 sizes="(max-width: 1280px) 100vw, 1200px"
-                className="object-cover object-top"
+                className="object-cover object-center"
               />
             ) : null}
           </div>
