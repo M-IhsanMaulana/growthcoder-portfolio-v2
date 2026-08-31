@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Experience from '#models/experience'
 import { experienceValidator, reorderCareerValidator } from '#validators/career_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import { DateTime } from 'luxon'
 
 export default class ExperiencesController {
@@ -56,6 +57,9 @@ export default class ExperiencesController {
       company: experience.company,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.created({
       success: true,
       message: 'Experience created successfully',
@@ -93,6 +97,9 @@ export default class ExperiencesController {
       company: experience.company,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.ok({
       success: true,
       message: 'Experience updated successfully',
@@ -106,6 +113,9 @@ export default class ExperiencesController {
     for (const item of payload.items) {
       await Experience.query().where('id', item.id).update({ order: item.order })
     }
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,
@@ -122,6 +132,9 @@ export default class ExperiencesController {
     await experience.delete()
 
     ActivityLogService.log(ctx, 'delete', 'experience', id, { company })
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,

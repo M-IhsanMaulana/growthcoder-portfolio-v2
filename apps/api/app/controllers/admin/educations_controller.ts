@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Education from '#models/education'
 import { educationValidator, reorderCareerValidator } from '#validators/career_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import { DateTime } from 'luxon'
 
 export default class EducationsController {
@@ -44,6 +45,9 @@ export default class EducationsController {
       institution: education.institution,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.created({
       success: true,
       message: 'Education created successfully',
@@ -75,6 +79,9 @@ export default class EducationsController {
       institution: education.institution,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.ok({
       success: true,
       message: 'Education updated successfully',
@@ -88,6 +95,9 @@ export default class EducationsController {
     for (const item of payload.items) {
       await Education.query().where('id', item.id).update({ order: item.order })
     }
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,
@@ -104,6 +114,9 @@ export default class EducationsController {
     await education.delete()
 
     ActivityLogService.log(ctx, 'delete', 'education', id, { institution })
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,

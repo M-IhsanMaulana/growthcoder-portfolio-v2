@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Philosophy from '#models/philosophy'
 import { philosophyValidator } from '#validators/service_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 
 export default class PhilosophiesController {
   async index({ response }: HttpContext) {
@@ -38,6 +39,9 @@ export default class PhilosophiesController {
 
     ActivityLogService.log(ctx, 'create', 'philosophy', philosophy.id, { title: philosophy.title })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.created({
       success: true,
       message: 'Development philosophy created successfully',
@@ -62,6 +66,9 @@ export default class PhilosophiesController {
 
     ActivityLogService.log(ctx, 'update', 'philosophy', philosophy.id, { title: philosophy.title })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.ok({
       success: true,
       message: 'Development philosophy updated successfully',
@@ -78,6 +85,9 @@ export default class PhilosophiesController {
     await philosophy.delete()
 
     ActivityLogService.log(ctx, 'delete', 'philosophy', id, { title })
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,

@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Certification from '#models/certification'
 import { certificationValidator, reorderCareerValidator } from '#validators/career_validator'
 import { ActivityLogService } from '#services/activity_log_service'
+import { RevalidateService } from '#services/revalidate_service'
 import { DateTime } from 'luxon'
 
 export default class CertificationsController {
@@ -44,6 +45,9 @@ export default class CertificationsController {
       name: certification.name,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.created({
       success: true,
       message: 'Certification created successfully',
@@ -73,6 +77,9 @@ export default class CertificationsController {
       name: certification.name,
     })
 
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
+
     return response.ok({
       success: true,
       message: 'Certification updated successfully',
@@ -86,6 +93,9 @@ export default class CertificationsController {
     for (const item of payload.items) {
       await Certification.query().where('id', item.id).update({ order: item.order })
     }
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,
@@ -102,6 +112,9 @@ export default class CertificationsController {
     await certification.delete()
 
     ActivityLogService.log(ctx, 'delete', 'certification', id, { name })
+
+    RevalidateService.revalidate('career').catch(() => {})
+    RevalidateService.revalidate('/about').catch(() => {})
 
     return response.ok({
       success: true,
