@@ -142,12 +142,16 @@ export function EducationTab({
                     <h4 className="text-base font-semibold text-foreground tracking-tight">
                       {edu.degree}
                     </h4>
-                    <span className="text-muted-foreground font-medium text-sm">
-                      •
-                    </span>
-                    <span className="text-sm font-medium text-foreground/90">
-                      {edu.fieldOfStudy}
-                    </span>
+                    {edu.fieldOfStudy && edu.fieldOfStudy !== "-" && (
+                      <>
+                        <span className="text-muted-foreground font-medium text-sm">
+                          •
+                        </span>
+                        <span className="text-sm font-medium text-foreground/90">
+                          {edu.fieldOfStudy}
+                        </span>
+                      </>
+                    )}
 
                     {edu.isCurrent ? (
                       <Badge

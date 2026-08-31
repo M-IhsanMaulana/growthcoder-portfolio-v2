@@ -488,7 +488,9 @@ export function InteractiveTimelineSection({
                           {/* Degree / Program */}
                           <h3 className="text-lg sm:text-2xl font-bold font-heading text-foreground tracking-tight mb-1">
                             {edu.degree}{" "}
-                            {edu.fieldOfStudy ? `— ${edu.fieldOfStudy}` : ""}
+                            {edu.fieldOfStudy && edu.fieldOfStudy !== "-"
+                              ? `— ${edu.fieldOfStudy}`
+                              : ""}
                           </h3>
 
                           {/* Institution Name */}

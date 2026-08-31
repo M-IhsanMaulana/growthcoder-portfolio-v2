@@ -9,9 +9,21 @@ import {
   Award,
   BookOpen,
   Building,
+  School,
   Sparkles,
+  Layers,
 } from "lucide-react";
-import { Button, Input, FormError, FormRequiredMark } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  FormError,
+  FormRequiredMark,
+} from "@/components/ui";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +33,7 @@ import {
   DialogFooter,
   Label,
   Switch,
+  Badge,
 } from "@growthcoder/ui";
 import { apiClient } from "@/lib/api-client";
 import { toast } from "sonner";
@@ -35,6 +48,98 @@ interface EducationDialogProps {
   onSuccess: (savedItem: Education) => void;
 }
 
+type EducationLevel = "smp" | "sma_smk" | "higher_ed" | "other";
+
+const LEVEL_OPTIONS: Array<{
+  value: EducationLevel;
+  label: string;
+  badge: string;
+  icon: React.ElementType;
+}> = [
+  {
+    value: "higher_ed",
+    label: "Perguruan Tinggi (Diploma / S1 / S2 / S3)",
+    badge: "Universitas / Kampus",
+    icon: GraduationCap,
+  },
+  {
+    value: "sma_smk",
+    label: "SMA / SMK / MA / Sederajat",
+    badge: "Sekolah Menengah Kejuruan / Atas",
+    icon: BookOpen,
+  },
+  {
+    value: "smp",
+    label: "SMP / MTs / Sederajat",
+    badge: "Sekolah Menengah Pertama",
+    icon: School,
+  },
+  {
+    value: "other",
+    label: "Non-Formal / Bootcamp / Pelatihan",
+    badge: "Kursus & Pelatihan",
+    icon: Layers,
+  },
+];
+
+const PRESET_DEGREES: Record<EducationLevel, string[]> = {
+  smp: ["SMP (Sekolah Menengah Pertama)", "MTs (Madrasah Tsanawiyah)"],
+  sma_smk: [
+    "SMK (Sekolah Menengah Kejuruan)",
+    "SMA (Sekolah Menengah Atas)",
+    "MA (Madrasah Aliyah)",
+  ],
+  higher_ed: [
+    "Sarjana (S1)",
+    "Diploma 3 (D3)",
+    "Diploma 4 (D4)",
+    "Magister (S2)",
+    "Doktor (S3)",
+  ],
+  other: [
+    "Bootcamp Intensive",
+    "Professional Certification",
+    "Kursus Keahlian",
+  ],
+};
+
+function detectEducationLevel(edu?: Education | null): EducationLevel {
+  if (!edu) return "higher_ed";
+  const deg = (edu.degree || "").toLowerCase();
+  const inst = (edu.institution || "").toLowerCase();
+
+  if (
+    deg.includes("smp") ||
+    deg.includes("mts") ||
+    deg.includes("menengah pertama") ||
+    inst.includes("smp") ||
+    inst.includes("mts")
+  ) {
+    return "smp";
+  }
+  if (
+    deg.includes("smk") ||
+    deg.includes("sma") ||
+    deg.includes("kejuruan") ||
+    deg.includes("aliyah") ||
+    deg.includes("menengah atas") ||
+    inst.includes("smk") ||
+    inst.includes("sma") ||
+    inst.includes("man ")
+  ) {
+    return "sma_smk";
+  }
+  if (
+    deg.includes("bootcamp") ||
+    deg.includes("kursus") ||
+    deg.includes("course") ||
+    deg.includes("sertifikasi")
+  ) {
+    return "other";
+  }
+  return "higher_ed";
+}
+
 export function EducationDialog({
   open,
   onOpenChange,
@@ -43,6 +148,7 @@ export function EducationDialog({
 }: EducationDialogProps) {
   const isEditing = Boolean(education);
 
+  const [level, setLevel] = useState<EducationLevel>("higher_ed");
   const [institution, setInstitution] = useState("");
   const [degree, setDegree] = useState("");
   const [fieldOfStudy, setFieldOfStudy] = useState("");
@@ -63,9 +169,12 @@ export function EducationDialog({
     if (open) {
       setErrors({});
       if (education) {
+        setLevel(detectEducationLevel(education));
         setInstitution(education.institution || "");
         setDegree(education.degree || "");
-        setFieldOfStudy(education.fieldOfStudy || "");
+        setFieldOfStudy(
+          education.fieldOfStudy === "-" ? "" : education.fieldOfStudy || "",
+        );
         setInstitutionLogoUrl(education.institutionLogoUrl || null);
         setStartDate(
           education.startDate ? education.startDate.split("T")[0] : "",
@@ -76,6 +185,7 @@ export function EducationDialog({
         setDescription(education.description || "");
         setOrder(education.order || 0);
       } else {
+        setLevel("higher_ed");
         setInstitution("");
         setDegree("");
         setFieldOfStudy("");
@@ -100,16 +210,29 @@ export function EducationDialog({
     }
   };
 
+  const handleLevelChange = (newLevel: EducationLevel) => {
+    setLevel(newLevel);
+    if (newLevel === "smp") {
+      clearFieldError("fieldOfStudy");
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!institution.trim()) {
-      newErrors.institution = "Nama Institusi / Universitas wajib diisi";
+      newErrors.institution =
+        level === "smp" || level === "sma_smk"
+          ? "Nama Sekolah wajib diisi"
+          : "Nama Institusi / Kampus wajib diisi";
     }
     if (!degree.trim()) {
-      newErrors.degree = "Gelar / Jenjang Pendidikan wajib diisi";
+      newErrors.degree = "Jenjang / Gelar Pendidikan wajib diisi";
     }
-    if (!fieldOfStudy.trim()) {
-      newErrors.fieldOfStudy = "Jurusan / Program Studi wajib diisi";
+    if (level !== "smp" && !fieldOfStudy.trim()) {
+      newErrors.fieldOfStudy =
+        level === "sma_smk"
+          ? "Jurusan / Bidang Keahlian wajib diisi"
+          : "Jurusan / Program Studi wajib diisi";
     }
     if (!startDate) {
       newErrors.startDate = "Tanggal Mulai wajib diisi";
@@ -144,7 +267,7 @@ export function EducationDialog({
       const payload = {
         institution: institution.trim(),
         degree: degree.trim(),
-        fieldOfStudy: fieldOfStudy.trim(),
+        fieldOfStudy: fieldOfStudy.trim() || (level === "smp" ? "-" : ""),
         institutionLogoUrl: institutionLogoUrl || null,
         startDate,
         endDate: isCurrent ? null : endDate || null,
@@ -203,6 +326,66 @@ export function EducationDialog({
     }
   };
 
+  // Dynamic placeholders and labels based on level
+  const institutionLabel =
+    level === "smp" || level === "sma_smk"
+      ? "Nama Sekolah"
+      : level === "other"
+        ? "Lembaga / Penyelenggara"
+        : "Institusi / Universitas";
+
+  const institutionPlaceholder =
+    level === "smp"
+      ? "Contoh: SMP Negeri 1 Jakarta / SMP IT Al-Azhar"
+      : level === "sma_smk"
+        ? "Contoh: SMKN 1 Cimahi / SMAN 3 Bandung"
+        : level === "other"
+          ? "Contoh: Hacktiv8 / Dicoding Academy"
+          : "Contoh: Universitas Indonesia / ITB";
+
+  const degreePlaceholder =
+    level === "smp"
+      ? "Contoh: Sekolah Menengah Pertama (SMP)"
+      : level === "sma_smk"
+        ? "Contoh: SMK (Sekolah Menengah Kejuruan)"
+        : level === "other"
+          ? "Contoh: Intensive Bootcamp Certificate"
+          : "Contoh: Bachelor of Computer Science (S.Kom)";
+
+  const fieldOfStudyLabel =
+    level === "sma_smk"
+      ? "Jurusan / Konsentrasi Keahlian"
+      : level === "smp"
+        ? "Jurusan / Peminatan (Opsional)"
+        : level === "other"
+          ? "Topik / Bidang Spesialisasi"
+          : "Jurusan / Program Studi";
+
+  const fieldOfStudyPlaceholder =
+    level === "sma_smk"
+      ? "Contoh: Rekayasa Perangkat Lunak (RPL) / TKJ"
+      : level === "smp"
+        ? "Tidak ada jurusan (bisa dikosongkan)"
+        : level === "other"
+          ? "Contoh: Full-Stack Web Development"
+          : "Contoh: Teknik Informatika / Computer Science";
+
+  const gradePlaceholder =
+    level === "smp" || level === "sma_smk"
+      ? "Contoh: Nilai Akhir: 89.5 / 100 atau Rata-rata UN: 88.0"
+      : level === "other"
+        ? "Contoh: Score: 95/100 (Distinction)"
+        : "Contoh: IPK 3.85 / 4.00 (Cum Laude)";
+
+  const descriptionPlaceholder =
+    level === "smp"
+      ? "Tuliskan keaktifan organisasi OSIS, ekstrakurikuler (Pramuka, PMR, Paskibra), atau prestasi lomba..."
+      : level === "sma_smk"
+        ? "Tuliskan fokus kejuruan, proyek tugas akhir/kejuruan, magang/PKL industri, organisasi..."
+        : level === "other"
+          ? "Tuliskan silabus utama, portofolio capstone project yang dibangun, dan sertifikat kelulusan..."
+          : "Tuliskan mata kuliah fokus, judul skripsi/thesis, keikutsertaan organisasi, atau publikasi...";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[88vh] flex flex-col p-0 gap-0 overflow-hidden shadow-2xl rounded-2xl">
@@ -219,8 +402,8 @@ export function EducationDialog({
                   : "Tambah Riwayat Pendidikan"}
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground text-left">
-                Isi data perguruan tinggi, jenjang gelar, masa studi, dan logo
-                institusi
+                Isi data jenjang pendidikan (SMP, SMA/SMK, Perguruan Tinggi), masa
+                studi, dan logo institusi
               </DialogDescription>
             </div>
           </div>
@@ -233,15 +416,51 @@ export function EducationDialog({
           noValidate
         >
           <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+            {/* Education Level Selector */}
+            <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-2">
+              <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-primary" />
+                  Tingkat / Kategori Pendidikan <FormRequiredMark />
+                </span>
+                <span className="text-[11px] font-normal text-muted-foreground">
+                  Sesuaikan form otomatis untuk SMP, SMK, atau Kuliah
+                </span>
+              </Label>
+              <Select
+                value={level}
+                onValueChange={(val) =>
+                  handleLevelChange(val as EducationLevel)
+                }
+              >
+                <SelectTrigger className="h-10 text-xs sm:text-sm bg-background">
+                  <SelectValue placeholder="Pilih Tingkat Pendidikan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEVEL_OPTIONS.map((opt) => {
+                    const Icon = opt.icon;
+                    return (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        <div className="flex items-center gap-2">
+                          <Icon className="w-4 h-4 text-primary shrink-0" />
+                          <span className="font-medium">{opt.label}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Institution & Degree */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <Building className="w-3.5 h-3.5 text-primary" />
-                  Institusi / Universitas <FormRequiredMark />
+                  {institutionLabel} <FormRequiredMark />
                 </Label>
                 <Input
-                  placeholder="Contoh: Universitas Indonesia / ITB"
+                  placeholder={institutionPlaceholder}
                   value={institution}
                   onChange={(e) => {
                     setInstitution(e.target.value);
@@ -254,12 +473,14 @@ export function EducationDialog({
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5 text-primary" />
-                  Gelar / Jenjang <FormRequiredMark />
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-primary" />
+                    Gelar / Jenjang <FormRequiredMark />
+                  </Label>
+                </div>
                 <Input
-                  placeholder="Contoh: Sarjana Komputer (S.Kom) / Bachelor"
+                  placeholder={degreePlaceholder}
                   value={degree}
                   onChange={(e) => {
                     setDegree(e.target.value);
@@ -268,6 +489,25 @@ export function EducationDialog({
                   error={errors.degree}
                   className="h-10 text-sm"
                 />
+                {/* Preset Suggestions */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  <span className="text-[10px] text-muted-foreground mr-1 self-center">
+                    Pilihan cepat:
+                  </span>
+                  {PRESET_DEGREES[level].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => {
+                        setDegree(preset);
+                        clearFieldError("degree");
+                      }}
+                      className="text-[10px] px-2 py-0.5 rounded-md bg-muted/80 hover:bg-primary/10 hover:text-primary border border-border/60 transition-colors cursor-pointer text-muted-foreground font-medium"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
                 <FormError message={errors.degree} />
               </div>
             </div>
@@ -277,10 +517,10 @@ export function EducationDialog({
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5 text-primary" />
-                  Jurusan / Program Studi <FormRequiredMark />
+                  {fieldOfStudyLabel} {level !== "smp" && <FormRequiredMark />}
                 </Label>
                 <Input
-                  placeholder="Contoh: Teknik Informatika / Computer Science"
+                  placeholder={fieldOfStudyPlaceholder}
                   value={fieldOfStudy}
                   onChange={(e) => {
                     setFieldOfStudy(e.target.value);
@@ -289,16 +529,22 @@ export function EducationDialog({
                   error={errors.fieldOfStudy}
                   className="h-10 text-sm"
                 />
+                {level === "smp" && (
+                  <p className="text-[11px] text-muted-foreground">
+                    💡 SMP tidak memiliki penjurusan, field ini boleh
+                    dikosongkan.
+                  </p>
+                )}
                 <FormError message={errors.fieldOfStudy} />
               </div>
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5 text-muted-foreground" />
-                  Nilai / IPK / Predikat
+                  Nilai / Nilai Akhir / IPK / Predikat
                 </Label>
                 <Input
-                  placeholder="Contoh: IPK 3.88 / 4.00 (Cum Laude)"
+                  placeholder={gradePlaceholder}
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
                   className="h-10 text-sm"
@@ -308,11 +554,11 @@ export function EducationDialog({
 
             {/* Logo Picker */}
             <LogoPickerField
-              label="Logo Institusi / Kampus"
-              description="Pilih logo kampus dari Media Library (format PNG/SVG/WebP)"
+              label="Logo Sekolah / Institusi / Kampus"
+              description="Pilih logo sekolah atau kampus dari Media Library (format PNG/SVG/WebP)"
               value={institutionLogoUrl}
               onChange={setInstitutionLogoUrl}
-              placeholderText="Pilih logo kampus dari Media Library"
+              placeholderText="Pilih logo sekolah / kampus dari Media Library"
             />
 
             {/* Dates & Ongoing status */}
@@ -324,7 +570,7 @@ export function EducationDialog({
                     Masa Studi
                   </Label>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Tentukan tanggal awal dan akhir masa perkuliahan
+                    Tentukan tanggal awal dan akhir masa studi
                   </p>
                 </div>
 
@@ -397,7 +643,7 @@ export function EducationDialog({
               <RichEditor
                 value={description}
                 onChange={setDescription}
-                placeholder="Tuliskan mata kuliah fokus, judul skripsi/thesis, keikutsertaan organisasi, atau publikasi..."
+                placeholder={descriptionPlaceholder}
               />
             </div>
 

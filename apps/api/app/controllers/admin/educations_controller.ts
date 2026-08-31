@@ -30,7 +30,7 @@ export default class EducationsController {
     const education = await Education.create({
       institution: payload.institution,
       degree: payload.degree,
-      fieldOfStudy: payload.fieldOfStudy,
+      fieldOfStudy: payload.fieldOfStudy || '',
       institutionLogoUrl: payload.institutionLogoUrl || null,
       startDate: DateTime.fromISO(payload.startDate),
       endDate: payload.endDate ? DateTime.fromISO(payload.endDate) : null,
@@ -59,7 +59,7 @@ export default class EducationsController {
     education.merge({
       institution: payload.institution,
       degree: payload.degree,
-      fieldOfStudy: payload.fieldOfStudy,
+      fieldOfStudy: payload.fieldOfStudy !== undefined ? payload.fieldOfStudy || '' : education.fieldOfStudy,
       institutionLogoUrl: payload.institutionLogoUrl || null,
       startDate: DateTime.fromISO(payload.startDate),
       endDate: payload.endDate ? DateTime.fromISO(payload.endDate) : null,

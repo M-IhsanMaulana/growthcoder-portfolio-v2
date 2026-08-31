@@ -331,7 +331,7 @@ export interface Education {
 export interface EducationFormPayload {
   institution: string;
   degree: string;
-  fieldOfStudy: string;
+  fieldOfStudy?: string;
   institutionLogoUrl?: string;
   startDate: string;
   endDate?: string | null;

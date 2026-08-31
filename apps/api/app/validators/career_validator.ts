@@ -23,7 +23,7 @@ export const educationValidator = vine.compile(
   vine.object({
     institution: vine.string().trim().maxLength(150),
     degree: vine.string().trim().maxLength(100),
-    fieldOfStudy: vine.string().trim().maxLength(150),
+    fieldOfStudy: vine.string().trim().maxLength(150).optional().nullable(),
     institutionLogoUrl: vine.string().trim().optional().nullable(),
     startDate: vine.string().trim(),
     endDate: vine.string().trim().optional().nullable(),
