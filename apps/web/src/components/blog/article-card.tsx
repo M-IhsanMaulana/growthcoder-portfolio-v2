@@ -40,13 +40,10 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
       className="h-full flex flex-col"
     >
       <TiltCard maxTilt={4} className="h-full rounded-3xl">
-        <article className="flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group h-full">
+        <article className="relative flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group h-full cursor-pointer">
           <div>
             {/* Article Cover Image */}
-            <Link
-              href={`/blog/${article.slug}`}
-              className="block relative aspect-[16/10] w-full overflow-hidden bg-muted/40"
-            >
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/40">
               {article.coverImage ? (
                 <Image
                   src={article.coverImage}
@@ -65,12 +62,12 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
               )}
 
               {/* Primary Badge */}
-              <div className="absolute top-3.5 left-3.5 z-10">
+              <div className="absolute top-3.5 left-3.5 pointer-events-none">
                 <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-background/90 backdrop-blur-md text-foreground border border-border/60 shadow-sm">
                   {primaryTag}
                 </span>
               </div>
-            </Link>
+            </div>
 
             {/* Article Metadata & Excerpt */}
             <div className="p-6 sm:p-7">
@@ -87,7 +84,12 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold font-heading text-foreground mb-2.5 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                <Link href={`/blog/${article.slug}`}>{article.title}</Link>
+                <Link
+                  href={`/blog/${article.slug}`}
+                  className="after:absolute after:inset-0 after:z-10 focus:outline-none"
+                >
+                  {article.title}
+                </Link>
               </h3>
 
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
@@ -112,13 +114,10 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
 
           {/* Bottom Action (View Counter completely excluded) */}
           <div className="px-6 sm:px-7 pb-6 pt-3 border-t border-border/30 flex items-center justify-between text-xs">
-            <Link
-              href={`/blog/${article.slug}`}
-              className="font-semibold text-primary inline-flex items-center gap-1.5 group/btn"
-            >
+            <span className="font-semibold text-primary inline-flex items-center gap-1.5 group/btn">
               <span>Baca Selengkapnya</span>
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" />
-            </Link>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </span>
 
             {article.category && (
               <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">

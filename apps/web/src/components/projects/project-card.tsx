@@ -38,7 +38,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
       className="h-full flex flex-col"
     >
       <TiltCard maxTilt={5} className="h-full rounded-3xl">
-        <article className="group flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
+        <article className="relative group flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 h-full cursor-pointer">
           {/* Cover Image & Overlay Badges */}
           <div className="relative w-full aspect-[16/10] overflow-hidden bg-muted">
             {project.coverImage ? (
@@ -58,7 +58,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
 
             {/* Top Badges */}
             <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none gap-2">
-              <div className="flex items-center gap-1.5 pointer-events-auto">
+              <div className="flex items-center gap-1.5">
                 {project.category && (
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-background/90 backdrop-blur-md text-foreground border border-border/60 shadow-sm">
                     {project.category.name}
@@ -70,7 +70,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
               </div>
 
               {project.isFeatured && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary text-primary-foreground shadow-sm pointer-events-auto">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary text-primary-foreground shadow-sm">
                   <Sparkles className="h-3 w-3" />
                   <span>Unggulan</span>
                 </span>
@@ -91,7 +91,12 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
               )}
 
               <h3 className="text-lg sm:text-xl font-bold font-heading text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                <Link href={`/projects/${project.slug}`}>{project.title}</Link>
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="after:absolute after:inset-0 after:z-10 focus:outline-none"
+                >
+                  {project.title}
+                </Link>
               </h3>
 
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
@@ -119,15 +124,12 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
 
             {/* Footer Actions */}
             <div className="pt-4 border-t border-border/40 flex items-center justify-between gap-3">
-              <Link
-                href={`/projects/${project.slug}`}
-                className="text-xs sm:text-sm font-semibold text-primary inline-flex items-center gap-1 group/btn"
-              >
+              <span className="text-xs sm:text-sm font-semibold text-primary inline-flex items-center gap-1">
                 <span>Studi Kasus</span>
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" />
-              </Link>
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
 
-              <div className="flex items-center gap-1.5">
+              <div className="relative z-20 flex items-center gap-1.5">
                 {project.repositoryUrl && (
                   <a
                     href={project.repositoryUrl}

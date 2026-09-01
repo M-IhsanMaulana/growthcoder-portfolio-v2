@@ -76,7 +76,7 @@ export function FeaturedProjectsBento({
             className="lg:col-span-7 flex flex-col"
           >
             <TiltCard maxTilt={4} className="h-full rounded-3xl">
-              <div className="flex flex-col justify-between h-full rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group">
+              <div className="relative flex flex-col justify-between h-full rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group cursor-pointer">
                 {/* Visual Cover Preview */}
                 <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
                   {primaryProject.coverImage ? (
@@ -95,10 +95,10 @@ export function FeaturedProjectsBento({
 
                   {/* Overlay Badges */}
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background/90 backdrop-blur-md text-foreground border border-border/60 shadow-sm pointer-events-auto">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background/90 backdrop-blur-md text-foreground border border-border/60 shadow-sm">
                       {primaryProject.projectYear || 2026}
                     </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-md pointer-events-auto">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-primary-foreground shadow-md">
                       Featured Case Study
                     </span>
                   </div>
@@ -108,7 +108,10 @@ export function FeaturedProjectsBento({
                 <div className="p-6 sm:p-8 flex flex-col justify-between flex-1">
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold font-heading text-foreground mb-3 group-hover:text-primary transition-colors">
-                      <Link href={`/projects/${primaryProject.slug}`}>
+                      <Link
+                        href={`/projects/${primaryProject.slug}`}
+                        className="after:absolute after:inset-0 after:z-10 focus:outline-none"
+                      >
                         {primaryProject.title}
                       </Link>
                     </h3>
@@ -133,24 +136,24 @@ export function FeaturedProjectsBento({
 
                   {/* Footer Actions */}
                   <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                    <Link
-                      href={`/projects/${primaryProject.slug}`}
-                      className="text-xs sm:text-sm font-semibold text-primary inline-flex items-center gap-1.5 group/btn"
-                    >
+                    <span className="text-xs sm:text-sm font-semibold text-primary inline-flex items-center gap-1.5 group/btn">
                       <span>Baca Detail Studi Kasus</span>
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
 
                     {primaryProject.demoUrl && (
-                      <a
-                        href={primaryProject.demoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs font-medium text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-                      >
-                        <span>Live Demo</span>
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
+                      <div className="relative z-20">
+                        <a
+                          href={primaryProject.demoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs font-medium text-muted-foreground hover:text-foreground inline-flex items-center gap-1 p-1 rounded-md hover:bg-muted/60 transition-colors"
+                        >
+                          <span>Live Demo</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -170,23 +173,25 @@ export function FeaturedProjectsBento({
                 className="flex-1 flex flex-col"
               >
                 <TiltCard maxTilt={5} className="h-full rounded-3xl">
-                  <div className="h-full flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl p-6 sm:p-7 shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300 group">
+                  <div className="relative h-full flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl p-6 sm:p-7 shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300 group cursor-pointer">
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-muted text-muted-foreground border border-border/60">
                           {project.projectYear || 2025}
                         </span>
-                        <Link
-                          href={`/projects/${project.slug}`}
+                        <div
+                          aria-hidden="true"
                           className="h-8 w-8 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors"
-                          aria-label={`Lihat proyek ${project.title}`}
                         >
                           <ArrowUpRight className="h-4 w-4" />
-                        </Link>
+                        </div>
                       </div>
 
                       <h4 className="text-lg sm:text-xl font-bold font-heading text-foreground mb-2 group-hover:text-primary transition-colors">
-                        <Link href={`/projects/${project.slug}`}>
+                        <Link
+                          href={`/projects/${project.slug}`}
+                          className="after:absolute after:inset-0 after:z-10 focus:outline-none"
+                        >
                           {project.title}
                         </Link>
                       </h4>
@@ -208,24 +213,24 @@ export function FeaturedProjectsBento({
                     </div>
 
                     <div className="pt-3 border-t border-border/30 flex items-center justify-between text-xs">
-                      <Link
-                        href={`/projects/${project.slug}`}
-                        className="font-medium text-primary hover:underline inline-flex items-center gap-1"
-                      >
+                      <span className="font-medium text-primary inline-flex items-center gap-1">
                         <span>Pelajari Solusi</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </Link>
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                      </span>
 
                       {project.demoUrl && (
-                        <a
-                          href={project.demoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-                        >
-                          <span>Demo</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <div className="relative z-20">
+                          <a
+                            href={project.demoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 p-1 rounded-md hover:bg-muted/60 transition-colors"
+                          >
+                            <span>Demo</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
                       )}
                     </div>
                   </div>

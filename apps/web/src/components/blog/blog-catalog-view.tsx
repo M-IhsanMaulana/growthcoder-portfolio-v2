@@ -640,19 +640,24 @@ export function BlogCatalogView({
               <Sparkles className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-bold font-heading text-foreground mb-2">
-              Tidak Ada Artikel yang Ditemukan
+              {hasActiveFilters
+                ? "Tidak Ada Artikel yang Ditemukan"
+                : "Belum Ada Artikel yang Dipublikasikan"}
             </h3>
             <p className="text-sm text-muted-foreground max-w-md mb-6 leading-relaxed">
-              Tidak ditemukan artikel yang sesuai dengan filter atau kata kunci
-              pencarian Anda. Coba sesuaikan kata kunci atau bersihkan filter.
+              {hasActiveFilters
+                ? "Tidak ditemukan artikel yang sesuai dengan filter atau kata kunci pencarian Anda. Coba sesuaikan kata kunci atau bersihkan filter."
+                : "Artikel dan catatan terbaru akan segera hadir. Pantau terus halaman ini untuk pembaruan terkini."}
             </p>
-            <Button
-              onClick={handleClearFilters}
-              variant="outline"
-              className="rounded-full px-6"
-            >
-              Tampilkan Semua Artikel
-            </Button>
+            {hasActiveFilters && (
+              <Button
+                onClick={handleClearFilters}
+                variant="outline"
+                className="rounded-full px-6"
+              >
+                Tampilkan Semua Artikel
+              </Button>
+            )}
           </motion.div>
         ) : (
           <motion.div

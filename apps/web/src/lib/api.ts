@@ -2094,20 +2094,20 @@ export async function getLatestArticles(limit: number = 3): Promise<Article[]> {
     );
 
     if (!res.ok) {
-      return FALLBACK_LATEST_ARTICLES;
+      return [];
     }
 
     const json = await res.json();
     const data = json.data;
 
-    if (Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data)) {
       return data.slice(0, limit);
     }
 
-    return FALLBACK_LATEST_ARTICLES;
+    return [];
   } catch (_error) {
-    console.warn("[Articles] Using default fallback articles.");
-    return FALLBACK_LATEST_ARTICLES;
+    console.warn("[Articles] Error fetching latest articles:", _error);
+    return [];
   }
 }
 
@@ -2349,7 +2349,15 @@ export async function getAllArticles(
     );
 
     if (!res.ok) {
-      return getFallbackArticlesWithFilter(params);
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page: params?.page || 1,
+          perPage: params?.perPage || 9,
+          lastPage: 1,
+        },
+      };
     }
 
     const json = await res.json();
@@ -2360,70 +2368,32 @@ export async function getAllArticles(
           total: json.data.length,
           page: params?.page || 1,
           perPage: params?.perPage || 9,
-          lastPage: Math.ceil(json.data.length / (params?.perPage || 9)),
+          lastPage: Math.ceil(json.data.length / (params?.perPage || 9)) || 1,
         },
       };
     }
 
-    return getFallbackArticlesWithFilter(params);
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        page: params?.page || 1,
+        perPage: params?.perPage || 9,
+        lastPage: 1,
+      },
+    };
   } catch (_error) {
-    console.warn("[Articles] Using default fallback articles list.");
-    return getFallbackArticlesWithFilter(params);
+    console.warn("[Articles] Error fetching articles list:", _error);
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        page: params?.page || 1,
+        perPage: params?.perPage || 9,
+        lastPage: 1,
+      },
+    };
   }
-}
-
-function getFallbackArticlesWithFilter(params?: ArticleFilterParams): {
-  data: Article[];
-  meta: PaginationMeta;
-} {
-  let filtered = [...FALLBACK_ALL_ARTICLES];
-
-  if (params?.category && params.category !== "all") {
-    filtered = filtered.filter(
-      (a) =>
-        a.category?.slug === params.category ||
-        a.categoryId === params.category ||
-        a.category?.name.toLowerCase() === params.category?.toLowerCase(),
-    );
-  }
-
-  if (params?.tag && params.tag !== "all") {
-    filtered = filtered.filter((a) =>
-      a.tags?.some(
-        (t) =>
-          t.slug === params.tag ||
-          t.id === params.tag ||
-          t.name.toLowerCase() === params.tag?.toLowerCase(),
-      ),
-    );
-  }
-
-  if (params?.search && params.search.trim() !== "") {
-    const q = params.search.toLowerCase().trim();
-    filtered = filtered.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.excerpt.toLowerCase().includes(q) ||
-        a.content.toLowerCase().includes(q),
-    );
-  }
-
-  const page = Number(params?.page) || 1;
-  const perPage = Number(params?.perPage) || 9;
-  const total = filtered.length;
-  const lastPage = Math.max(1, Math.ceil(total / perPage));
-  const offset = (page - 1) * perPage;
-  const paginated = filtered.slice(offset, offset + perPage);
-
-  return {
-    data: paginated,
-    meta: {
-      total,
-      page,
-      perPage,
-      lastPage,
-    },
-  };
 }
 
 /**
@@ -2433,7 +2403,6 @@ export async function getArticleBySlug(
   slug: string,
   previewOptions?: { preview?: boolean; token?: string },
 ): Promise<Article | null> {
-  const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
   const isPreview = Boolean(previewOptions?.preview);
 
   try {
@@ -2455,41 +2424,14 @@ export async function getArticleBySlug(
     });
 
     if (!res.ok) {
-      const match = FALLBACK_ALL_ARTICLES.find(
-        (a) =>
-          a.slug === slug ||
-          a.id === slug ||
-          a.slug.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedSlug ||
-          normalizedSlug.includes(
-            a.slug.toLowerCase().replace(/[^a-z0-9]/g, ""),
-          ) ||
-          a.slug
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "")
-            .includes(normalizedSlug),
-      );
-      return match || null;
+      return null;
     }
 
     const json = await res.json();
     return json.data || null;
   } catch (_error) {
-    console.warn(`[ArticleDetail] Using fallback for slug: ${slug}`);
-    return (
-      FALLBACK_ALL_ARTICLES.find(
-        (a) =>
-          a.slug === slug ||
-          a.id === slug ||
-          a.slug.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedSlug ||
-          normalizedSlug.includes(
-            a.slug.toLowerCase().replace(/[^a-z0-9]/g, ""),
-          ) ||
-          a.slug
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "")
-            .includes(normalizedSlug),
-      ) || null
-    );
+    console.warn(`[ArticleDetail] Error fetching slug: ${slug}`, _error);
+    return null;
   }
 }
 
@@ -2507,13 +2449,13 @@ export async function getArticleCategories(): Promise<Category[]> {
 
     if (res.ok) {
       const json = await res.json();
-      if (Array.isArray(json.data) && json.data.length > 0) {
+      if (Array.isArray(json.data)) {
         return json.data;
       }
     }
-    return FALLBACK_ARTICLE_CATEGORIES;
+    return [];
   } catch {
-    return FALLBACK_ARTICLE_CATEGORIES;
+    return [];
   }
 }
 
@@ -2531,13 +2473,13 @@ export async function getArticleTags(): Promise<Tag[]> {
 
     if (res.ok) {
       const json = await res.json();
-      if (Array.isArray(json.data) && json.data.length > 0) {
+      if (Array.isArray(json.data)) {
         return json.data;
       }
     }
-    return FALLBACK_ARTICLE_TAGS;
+    return [];
   } catch {
-    return FALLBACK_ARTICLE_TAGS;
+    return [];
   }
 }
 
@@ -2549,7 +2491,7 @@ export async function getAdjacentArticles(
 ): Promise<{ prev: Article | null; next: Article | null }> {
   try {
     const { data: all } = await getAllArticles({ perPage: 50 });
-    const list = all.length > 0 ? all : FALLBACK_ALL_ARTICLES;
+    const list = all;
     const currentIndex = list.findIndex(
       (a) => a.slug === currentSlug || a.id === currentSlug,
     );
@@ -2577,9 +2519,12 @@ export async function getRelatedArticles(
   limit: number = 3,
 ): Promise<Article[]> {
   try {
-    const list = FALLBACK_ALL_ARTICLES.filter(
+    const { data: all } = await getAllArticles({ perPage: 50 });
+    const list = all.filter(
       (a) => a.slug !== currentSlug && a.id !== currentSlug,
     );
+
+    if (list.length === 0) return [];
 
     // Prioritize same category or matching tags
     const scored = list.map((art) => {
@@ -2604,10 +2549,7 @@ export async function getRelatedArticles(
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, limit).map((s) => s.article);
   } catch {
-    return FALLBACK_ALL_ARTICLES.filter((a) => a.slug !== currentSlug).slice(
-      0,
-      limit,
-    );
+    return [];
   }
 }
 
