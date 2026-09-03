@@ -289,13 +289,13 @@ export default async function ArticleDetailPage({
           {/* Featured Cover Image (Full width of container) */}
           {article.coverImage && (
             <div className="w-full my-8 sm:my-12">
-              <div className="relative aspect-[21/10] sm:aspect-[21/9] w-full rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-muted">
+              <div className="relative aspect-video w-full rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-muted">
                 <Image
                   src={article.coverImage}
                   alt={article.title}
                   fill
                   priority
-                  className="object-cover"
+                  className="object-cover object-center"
                   sizes="(max-width: 1280px) 100vw, 1280px"
                 />
               </div>

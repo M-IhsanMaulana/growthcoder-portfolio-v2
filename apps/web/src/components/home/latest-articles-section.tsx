@@ -77,13 +77,13 @@ export function LatestArticlesSection({
             >
               <div>
                 {/* Article Cover Image */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+                <div className="relative aspect-video w-full overflow-hidden bg-muted">
                   {article.coverImage ? (
                     <Image
                       src={article.coverImage}
                       alt={article.title}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   ) : (

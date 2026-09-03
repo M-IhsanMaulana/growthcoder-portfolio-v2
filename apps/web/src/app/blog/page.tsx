@@ -59,7 +59,7 @@ function BlogLoadingFallback() {
             key={i}
             className="rounded-3xl border border-border/60 bg-card/40 h-80 flex flex-col justify-between p-6"
           >
-            <div className="w-full aspect-[16/10] bg-muted/60 rounded-2xl mb-4" />
+            <div className="w-full aspect-video bg-muted/60 rounded-2xl mb-4" />
             <div className="h-4 bg-muted/60 rounded-md w-3/4 mb-2" />
             <div className="h-3 bg-muted/40 rounded-md w-full mb-4" />
             <div className="flex gap-2">

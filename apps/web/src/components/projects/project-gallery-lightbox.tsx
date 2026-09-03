@@ -211,7 +211,7 @@ export function ProjectGalleryLightbox({
           <motion.div
             key={item.id || index}
             whileHover={{ y: -4 }}
-            className="group relative aspect-[16/10] rounded-2xl overflow-hidden border border-border/70 bg-card/60 cursor-pointer shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300"
+            className="group relative aspect-video rounded-2xl overflow-hidden border border-border/70 bg-card/60 cursor-pointer shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300"
             onClick={() => handleOpen(index)}
           >
             <Image
@@ -219,7 +219,7 @@ export function ProjectGalleryLightbox({
               alt={item.caption || `${projectTitle} Screenshot ${index + 1}`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
             />
 
             {/* Hover overlay with zoom icon & caption */}

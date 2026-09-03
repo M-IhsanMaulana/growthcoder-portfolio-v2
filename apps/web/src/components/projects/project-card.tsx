@@ -40,7 +40,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
       <TiltCard maxTilt={5} className="h-full rounded-3xl">
         <article className="relative group flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 h-full cursor-pointer">
           {/* Cover Image & Overlay Badges */}
-          <div className="relative w-full aspect-[16/10] overflow-hidden bg-muted">
+          <div className="relative w-full aspect-video overflow-hidden bg-muted">
             {project.coverImage ? (
               <Image
                 src={project.coverImage}
@@ -48,7 +48,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
                 fill
                 priority={priority}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted/60 text-muted-foreground font-mono text-xs">

@@ -78,13 +78,13 @@ export function FeaturedProjectsBento({
             <TiltCard maxTilt={4} className="h-full rounded-3xl">
               <div className="relative flex flex-col justify-between h-full rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group cursor-pointer">
                 {/* Visual Cover Preview */}
-                <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+                <div className="relative w-full aspect-video overflow-hidden bg-muted">
                   {primaryProject.coverImage ? (
                     <Image
                       src={primaryProject.coverImage}
                       alt={primaryProject.title}
                       fill
-                      className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 1024px) 100vw, 60vw"
                     />
                   ) : (

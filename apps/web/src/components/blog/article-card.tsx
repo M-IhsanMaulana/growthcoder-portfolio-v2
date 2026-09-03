@@ -43,13 +43,13 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
         <article className="relative flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 backdrop-blur-xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group h-full cursor-pointer">
           <div>
             {/* Article Cover Image */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/40">
+            <div className="relative aspect-video w-full overflow-hidden bg-muted/40">
               {article.coverImage ? (
                 <Image
                   src={article.coverImage}
                   alt={article.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               ) : (
